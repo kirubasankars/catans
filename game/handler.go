@@ -13,20 +13,23 @@ func TimeoutHandler(gc *GameContext) {
 	if IsActionTimeout(*gc, *playerAction) {
 		return
 	}
+
 	fmt.Println(gc.Phase, gc.Action.Name, gc.GetCurrentPlayer().Id)
-	switch playerAction.Name {
-	case ActionPlaceSettlement:
-		{
-			if gc.Phase == Phase2 || gc.Phase == Phase3 {
+
+	if gc.Phase == Phase2 || gc.Phase == Phase3 {
+		switch playerAction.Name {
+		case ActionPlaceSettlement:
+			{
 				HandlePlaceInitialSettlement(gc)
 			}
-		}
-	case ActionPlaceRoad:
-		{
-			if gc.Phase == Phase2 || gc.Phase == Phase3 {
+		case ActionPlaceRoad:
+			{
 				HandlePlaceInitialRoad(gc)
 			}
 		}
+	}
+
+	switch playerAction.Name {
 	case ActionDiscardCards:
 		{
 			HandleDiscardCards(gc)

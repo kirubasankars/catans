@@ -40,15 +40,15 @@ func (gc GameContext) GetGamePhase() string {
 }
 
 func (gc *GameContext) PutSettlement(settlement Settlement) {
-	gc.Settlements = append(gc.Settlements, settlement)
+	gc.GetCurrentPlayer().PutSettlement(settlement)
 }
 
-func (gc *GameContext) PutRoad(road Road) {
-	gc.Roads = append(gc.Roads, road)
+func (gc *GameContext) PutRoad(road [2]int) {
+	gc.GetCurrentPlayer().PutRoad(road)
 }
 
-func (gc *GameContext) HandOverCards(player *Player, cards []string) {
-	player.Cards = append(player.Cards, cards...)
+func (gc *GameContext) HandOverCards(player *Player, cardType int, count int) {
+	player.Cards[cardType] = player.Cards[cardType] + count
 }
 
 func (gc *GameContext) UpdateGameSetting(gs GameSetting) {
@@ -65,21 +65,17 @@ func (gc *GameContext) UpdateGameSetting(gs GameSetting) {
 func (gc *GameContext) IsInitialSettlementDone() bool {
 	settlementCount := 0
 	for _, player := range gc.Players {
-		for _, owner := range gc.Settlements {
-			if player.Id == owner.player.Id {
-				settlementCount++
-			}
-		}
+		settlementCount = settlementCount + len(player.Settlements)
 	}
 	return settlementCount == (gc.setting.NumberOfPlayers * 2)
 }
 
-func (gc GameContext) GetAction() *PlayerAction {
+func (gc GameContext) GetAction() *Action {
 	return &gc.Action
 }
 
 func (gc *GameContext) ScheduleAction(action string) {
-	gc.Action = PlayerAction{Name: action, Timeout: time.Now()}
+	gc.Action = Action{Name: action, Timeout: time.Now()}
 }
 
 func (gc *GameContext) EndAction() error {
@@ -149,5 +145,6 @@ func (gc *GameContext) EndAction() error {
 func NewGameContext() GameContext {
 	gc := new(GameContext)
 	gc.Phase = Phase1
+	gc.Bank = NewBank()
 	return *gc
 }

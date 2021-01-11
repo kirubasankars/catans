@@ -50,7 +50,7 @@ func (game *Game) UpdateGameSetting(gs GameSetting) {
 
 func NewGame() *Game {
 	game := new(Game)
-	game.ticker = time.NewTicker(1 * time.Second)
+	game.ticker = time.NewTicker(500 * time.Millisecond)
 	game.tickerDone = make(chan bool)
 	game.gameContext = NewGameContext()
 	return game

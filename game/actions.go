@@ -8,7 +8,12 @@ import (
 	"time"
 )
 
-func IsActionTimeout(gc GameContext, action PlayerAction) bool {
+type Action struct {
+	Name    string
+	Timeout time.Time
+}
+
+func IsActionTimeout(gc GameContext, action Action) bool {
 	timeout := 0
 	if gc.setting.Speed == 0 {
 		switch action.Name {
@@ -39,34 +44,21 @@ func IsActionTimeout(gc GameContext, action PlayerAction) bool {
 	return true
 }
 
-func TerrainCard(terrain string) string {
-	switch terrain {
-	case "MO":
-		return "S"
-	case "FO":
-		return "L"
-	case "HI":
-		return "B"
-	case "FI":
-		return "G"
-	case "PA":
-		return "W"
-	}
-	return ""
-}
-
 func HandleDiscardCards(gc *GameContext) {
-	for _, player := range gc.Players {
-		if len(player.Cards) > 7 {
-			fmt.Println(fmt.Sprintf("Player %d looses %d cards.", player.Id, len(player.Cards)/2))
-		}
-	}
+	//for _, player := range gc.Players {
+	//	if len(player.Cards) > 7 {
+	//		fmt.Println(fmt.Sprintf("Player %d looses %d cards.", player.Id, len(player.Cards)/2))
+	//	}
+	//}
 }
 
-func GetAvailableIntersections(gc GameContext) ([]string, error) {
+func GetAvailableIntersections(gc GameContext) ([]int, error) {
 
 	if Phase4 == gc.Phase {
-
+		//currentPlayer := gc.GetCurrentPlayer()
+		//for _, _ := range currentPlayer.Roads {
+		//
+		//}
 	}
 
 	if Phase2 == gc.Phase || Phase3 == gc.Phase {
@@ -74,9 +66,11 @@ func GetAvailableIntersections(gc GameContext) ([]string, error) {
 		if nextAction == nil || (nextAction != nil && nextAction.Name != ActionPlaceSettlement) {
 			return nil, errors.New("invalid action")
 		}
-		occupied := make([]string, 0, len(gc.Settlements))
-		for _, s := range gc.Settlements {
-			occupied = append(occupied, s.Intersection)
+		occupied := make([]int, 0)
+		for _, player := range gc.Players {
+			for _, s := range player.Settlements {
+				occupied = append(occupied, s.Intersection)
+			}
 		}
 		return gc.board.GetAvailableIntersections(occupied), nil
 	}
@@ -84,42 +78,54 @@ func GetAvailableIntersections(gc GameContext) ([]string, error) {
 	return nil, nil
 }
 
-func GetAvailableRoads(gc GameContext) ([][2]string, error) {
+func GetAvailableRoads(gc GameContext) ([][2]int, error) {
 
 	if Phase4 == gc.Phase {
 		currentPlayer := gc.GetCurrentPlayer()
-		var roadIntersections []string
-		for _, road := range gc.Roads {
-			if road.player == currentPlayer {
-				roadIntersections = append(roadIntersections, road.Points[0], road.Points[1])
-			}
-		}
-		var settlementIntersections []string
-		for _, road := range gc.Settlements {
-			if road.player == currentPlayer {
-				settlementIntersections = append(settlementIntersections, road.Intersection)
-			}
+		var usedIntersections = make(map[int]int)
+		for _, settlement := range currentPlayer.Settlements {
+			usedIntersections[settlement.Intersection] = 0
 		}
 
-		//remove settlement intersections from road
-		for i := 0; i < len(roadIntersections); i++ {
-			for _, intersection := range settlementIntersections {
-				if intersection == roadIntersections[i] {
+		for _, road := range currentPlayer.Roads {
+			usedIntersections[road[0]] = 0
+			usedIntersections[road[1]] = 0
+		}
 
+		var roads [][2]int
+		for ins, _ := range usedIntersections {
+			neighborIntersections := gc.board.GetNeighborIntersections(ins)
+			roads = append(roads, neighborIntersections...)
+		}
+
+		var allRoads [][2]int
+		for _, player := range gc.Players {
+			allRoads = append(allRoads, player.Roads...)
+		}
+
+		var availableRoads [][2]int
+		for _, newRoad := range roads {
+			found := false
+			for _, currentRoad := range allRoads {
+				if newRoad[0] == currentRoad[0] && newRoad[1] == currentRoad[1] {
+					found = true
+					break
 				}
 			}
+			if !found {
+				availableRoads = append(availableRoads, newRoad)
+			}
 		}
 
+		return availableRoads, nil
 	}
 
 	if Phase2 == gc.Phase || Phase3 == gc.Phase {
-		getRoadsForIntersection := func(settlement *Settlement) [][2]string {
-			var roads [][2]string
+		getRoadsForIntersection := func(settlement *Settlement) [][2]int {
+			var roads [][2]int
 			if settlement != nil {
 				neighborIntersections := gc.board.GetNeighborIntersections(settlement.Intersection)
-				for _, ins := range neighborIntersections {
-					roads = append(roads, [2]string{settlement.Intersection, ins})
-				}
+				roads = append(roads, neighborIntersections...)
 			}
 			return roads
 		}
@@ -130,11 +136,10 @@ func GetAvailableRoads(gc GameContext) ([][2]string, error) {
 				return nil, errors.New("invalid action")
 			}
 			currentPlayer := gc.GetCurrentPlayer()
+
 			var firstSettlement *Settlement
-			for _, settlement := range gc.Settlements {
-				if settlement.player == currentPlayer {
-					firstSettlement = &settlement
-				}
+			if len(currentPlayer.Settlements) > 0 {
+				firstSettlement = &currentPlayer.Settlements[0]
 			}
 			return getRoadsForIntersection(firstSettlement), nil
 		}
@@ -144,19 +149,16 @@ func GetAvailableRoads(gc GameContext) ([][2]string, error) {
 			if nextAction == nil || (nextAction != nil && nextAction.Name != ActionPlaceRoad) {
 				return nil, errors.New("invalid action")
 			}
+
 			currentPlayer := gc.GetCurrentPlayer()
 			var (
 				settlementCounter = 1
 				secondSettlement  *Settlement
 			)
 
-			for _, settlement := range gc.Settlements {
-				if settlement.player == currentPlayer {
-					if settlementCounter == 2 {
-						secondSettlement = &settlement
-					}
-					settlementCounter++
-				}
+			if len(currentPlayer.Settlements) > 1 {
+				settlementCounter++
+				secondSettlement = &currentPlayer.Settlements[1]
 			}
 
 			return getRoadsForIntersection(secondSettlement), nil
@@ -166,7 +168,7 @@ func GetAvailableRoads(gc GameContext) ([][2]string, error) {
 	return nil, errors.New("invalid action")
 }
 
-func PlaceSettlement(gc *GameContext, validate bool, selectedIntersection string) error {
+func PlaceSettlement(gc *GameContext, validate bool, selectedIntersection int) error {
 	if validate {
 		availableIntersections, _ := GetAvailableIntersections(*gc)
 		matched := false
@@ -190,15 +192,14 @@ func PlaceSettlement(gc *GameContext, validate bool, selectedIntersection string
 		for i, idx := range tileIndices {
 			tokens[i] = gc.tiles[idx].Token
 		}
-		currentPlayer := gc.GetCurrentPlayer()
-		settlement := Settlement{ player: currentPlayer, Indices: tileIndices, Tokens: tokens, Intersection: selectedIntersection}
+		settlement := Settlement{Indices: tileIndices, Tokens: tokens, Intersection: selectedIntersection}
 		gc.PutSettlement(settlement)
 	}
 
 	return nil
 }
 
-func PlaceRoad(gc *GameContext, validate bool, selectedRoad [2]string) error {
+func PlaceRoad(gc *GameContext, validate bool, selectedRoad [2]int) error {
 	if validate {
 		availableRoads, _ := GetAvailableRoads(*gc)
 		matched := false
@@ -217,7 +218,7 @@ func PlaceRoad(gc *GameContext, validate bool, selectedRoad [2]string) error {
 		if nextAction == nil || (nextAction != nil && nextAction.Name != ActionPlaceRoad) {
 			return errors.New("invalid action")
 		}
-		gc.PutRoad(Road{player: gc.GetCurrentPlayer(), Points: selectedRoad})
+		gc.PutRoad(selectedRoad)
 	}
 
 	return nil
@@ -225,21 +226,10 @@ func PlaceRoad(gc *GameContext, validate bool, selectedRoad [2]string) error {
 
 func Phase2GetNextAction(gc GameContext) string {
 	currentPlayer := gc.GetCurrentPlayer()
-	settlementCount := 0
-	for _, settlement := range gc.Settlements {
-		if settlement.player == currentPlayer {
-			settlementCount ++
-		}
-	}
+	settlementCount := len(currentPlayer.Settlements)
+	roadCount := len(currentPlayer.Roads)
 
-	roadCount := 0
-	for _, road := range gc.Roads {
-		if road.player == currentPlayer {
-			roadCount ++
-		}
-	}
-
-	if settlementCount == 0 && roadCount == 0  {
+	if settlementCount == 0 && roadCount == 0 {
 		return ActionPlaceSettlement
 	}
 	if settlementCount == 1 && roadCount == 0 {
@@ -253,19 +243,8 @@ func Phase2GetNextAction(gc GameContext) string {
 
 func Phase3GetNextAction(gc GameContext) string {
 	currentPlayer := gc.GetCurrentPlayer()
-	settlementCount := 0
-	for _, settlement := range gc.Settlements {
-		if settlement.player == currentPlayer {
-			settlementCount ++
-		}
-	}
-
-	roadCount := 0
-	for _, road := range gc.Roads {
-		if road.player == currentPlayer {
-			roadCount ++
-		}
-	}
+	settlementCount := len(currentPlayer.Settlements)
+	roadCount := len(currentPlayer.Roads)
 
 	if settlementCount == 1 && roadCount == 1 {
 		return ActionPlaceSettlement
@@ -296,40 +275,25 @@ func HandleRollDice(gc *GameContext) {
 
 	if sum == 7 {
 		gc.ScheduleAction(ActionDiscardCards)
+		return
 	}
 
-	for _, settlement := range gc.Settlements {
-		var cards []string
-		for idx, token := range settlement.Tokens {
-			if token == sum {
-				terrain := gc.tiles[settlement.Indices[idx]].Terrain
-				cards = append(cards, TerrainCard(terrain))
-			}
-		}
-		if len(cards)> 0 {
-			gc.HandOverCards(settlement.player, cards)
-			PrintStat(gc)
-		}
-	}
-}
-
-func PrintStat(gc *GameContext) {
 	for _, player := range gc.Players {
-		for _, settlement := range gc.Settlements {
-			if settlement.player.Id == player.Id {
-				//fmt.Println(settlement.Intersection)
+		for _, settlement := range player.Settlements {
+			for idx, token := range settlement.Tokens {
+				if token == sum {
+					terrain := gc.tiles[settlement.Indices[idx]].Terrain
+					count, _ := gc.Bank.Borrow(terrain, 1)
+					gc.HandOverCards(player, terrain, count)
+				}
 			}
 		}
-		var text []string
-		var cardstat = make(map[string]int)
-		for _, card := range player.Cards {
-			cardstat[card]++
-		}
-		for k, v := range cardstat {
-			text = append(text, fmt.Sprintf("%d%s", v, k))
-		}
-		if len(cardstat) > 0 {
-			fmt.Println(player.Id, text)
-		}
 	}
+
+	roads, _ := GetAvailableRoads(*gc)
+	_ = roads
+	for _, player := range gc.Players {
+		player.Stat()
+	}
+
 }

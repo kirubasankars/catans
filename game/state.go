@@ -2,23 +2,21 @@ package game
 
 type GameState struct {
 	Phase         string
-	Action 		  PlayerAction
-
+	Action        Action
+	Bank          *Bank
 	CurrentPlayer int
 	Players       []*Player
-	Roads		  []Road
-	Settlements   []Settlement
 }
 
 type Settlement struct {
 	Tokens       []int
 	Indices      []int
-	Intersection string
-
-	player       *Player
+	Intersection int
 }
 
 type Road struct {
-	Points    [2]string
+	Points    [2]int
 	player    *Player
 }
+
+

@@ -7,12 +7,13 @@ import (
 )
 
 type NodeCoordinator struct {
+	index     int
 	nodes     []*Node
 	sides     []int
 	neighbors []*NodeCoordinator
 }
 
-func (nc *NodeCoordinator) updateNodes(nodes []*Node, sides []int) {
+func (nc *NodeCoordinator) putNodes(nodes []*Node, sides []int) {
 	nc.nodes = nodes
 	nc.sides = sides
 
@@ -97,19 +98,11 @@ type CoordinatorBuilder struct {
 }
 
 func (cb *CoordinatorBuilder) GetNodeCoordinator(nodes []*Node, sides []int) *NodeCoordinator {
-	var (
-		keys []string
-		name string
-	)
-	for idx, node := range nodes {
-		keys = append(keys, fmt.Sprintf("%d#%d", node.index, sides[idx]))
-	}
-	name = strings.Join(keys, "-")
+	nc := new(NodeCoordinator)
+	nc.putNodes(nodes, sides)
+	name := fmt.Sprint(nc)
 	if _, ok := cb.coordinators[name]; !ok {
-		nc := new(NodeCoordinator)
-		nc.updateNodes(nodes, sides)
 		cb.coordinators[name] = nc
-
 	}
 	return cb.coordinators[name]
 }
@@ -130,13 +123,13 @@ func (cb CoordinatorBuilder) MakeIntersectionsConnected(nodes map[int]*Node) {
 		for side, src := range node.coordinators {
 			p := node.getPrevSide(side)
 			n := node.getNextSide(side)
-			prevCoord := node.coordinators[p]
-			nextCoord := node.coordinators[n]
-			if !exists(prevCoord, src.neighbors) {
-				src.neighbors = append(src.neighbors, prevCoord)
+			coordinator0 := node.coordinators[p]
+			coordinator1 := node.coordinators[n]
+			if !exists(coordinator0, src.neighbors) {
+				src.neighbors = append(src.neighbors, coordinator0)
 			}
-			if !exists(nextCoord, src.neighbors) {
-				src.neighbors = append(src.neighbors, nextCoord)
+			if !exists(coordinator1, src.neighbors) {
+				src.neighbors = append(src.neighbors, coordinator1)
 			}
 		}
 

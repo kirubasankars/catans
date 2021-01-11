@@ -1,11 +1,13 @@
 package main
 
 import (
+	"catans/board"
 	"catans/game"
 	"time"
 )
 
 func main() {
+	board.NewBoard()
 	catans := game.NewGameEngine()
 
 	gs := *new(game.GameSetting)

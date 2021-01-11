@@ -9,7 +9,7 @@ type MapSetting interface {
 
 type Map struct {
 	nodes        map[int]*Node
-	coordinators map[string]*NodeCoordinator
+	coordinators map[int]*NodeCoordinator
 }
 
 func (_map *Map) build(mapSetting MapSetting) {
@@ -45,10 +45,33 @@ func (_map *Map) build(mapSetting MapSetting) {
 		threePointsCoordinators := node.findThreePointsCoordinators(*builder)
 		updateNC(node, threePointsCoordinators)
 	}
-
 	builder.MakeIntersectionsConnected(_map.nodes)
 
-	_map.coordinators = builder.coordinators
+	//_map.coordinators = builder.coordinators
+
+	counter := 0
+	for i := 0; i < 19; i++ {
+		for j := 0; j < 6; j++ {
+			for _, coordinator := range builder.coordinators {
+				node := coordinator.nodes[0]
+				if node.index == i && coordinator.sides[0] == j {
+					coordinator.index = counter
+					counter++
+				}
+			}
+		}
+	}
+
+	var coordinators = make(map[int]*NodeCoordinator, len(builder.coordinators))
+	for _, coordinator := range builder.coordinators {
+		coordinators[coordinator.index] = coordinator
+	}
+	_map.coordinators = coordinators
+	//fmt.Println(coordinators)
+
+	//for _, ins := range builder.coordinators {
+	//	fmt.Println(ins.index, ins)
+	//}
 
 	//for i := 0; i < len(_map.nodes); i++ {
 	//	fmt.Println(_map.nodes[i])
@@ -60,6 +83,6 @@ func (_map *Map) build(mapSetting MapSetting) {
 func newMap() Map {
 	board := new(Map)
 	board.nodes = make(map[int]*Node)
-	board.coordinators = make(map[string]*NodeCoordinator)
+	board.coordinators = make(map[int]*NodeCoordinator)
 	return *board
 }
