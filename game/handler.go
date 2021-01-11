@@ -5,11 +5,11 @@ import (
 )
 
 func TimeoutHandler(gc *GameContext) {
-	if gc.GetAction() == nil {
+	if gc.getAction() == nil {
 		return
 	}
 
-	playerAction := gc.GetAction()
+	playerAction := gc.getAction()
 	if IsActionTimeout(*gc, *playerAction) {
 		return
 	}
@@ -40,7 +40,7 @@ func TimeoutHandler(gc *GameContext) {
 		}
 	}
 
-	err := gc.EndAction()
+	err := gc.endAction()
 	if err != nil {
 		fmt.Println(err)
 	}

@@ -16,7 +16,11 @@ func (ge GameEngine) CreateGame(gs GameSetting) string {
 }
 
 func (ge GameEngine) Start(gameID string) {
-	ge.games[gameID].Start()
+	ge.games[gameID].start()
+}
+
+func (ge GameEngine) GetGame(gameID string) Game {
+	return *ge.games[gameID]
 }
 
 func NewGameEngine() *GameEngine {

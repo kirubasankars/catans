@@ -62,7 +62,7 @@ func GetAvailableIntersections(gc GameContext) ([]int, error) {
 	}
 
 	if Phase2 == gc.Phase || Phase3 == gc.Phase {
-		nextAction := gc.GetAction()
+		nextAction := gc.getAction()
 		if nextAction == nil || (nextAction != nil && nextAction.Name != ActionPlaceSettlement) {
 			return nil, errors.New("invalid action")
 		}
@@ -131,7 +131,7 @@ func GetAvailableRoads(gc GameContext) ([][2]int, error) {
 		}
 
 		if Phase2 == gc.Phase {
-			nextAction := gc.GetAction()
+			nextAction := gc.getAction()
 			if nextAction == nil || (nextAction != nil && nextAction.Name != ActionPlaceRoad) {
 				return nil, errors.New("invalid action")
 			}
@@ -145,7 +145,7 @@ func GetAvailableRoads(gc GameContext) ([][2]int, error) {
 		}
 
 		if Phase3 == gc.Phase {
-			nextAction := gc.GetAction()
+			nextAction := gc.getAction()
 			if nextAction == nil || (nextAction != nil && nextAction.Name != ActionPlaceRoad) {
 				return nil, errors.New("invalid action")
 			}
@@ -183,7 +183,7 @@ func PlaceSettlement(gc *GameContext, validate bool, selectedIntersection int) e
 	}
 
 	if Phase2 == gc.Phase || Phase3 == gc.Phase {
-		nextAction := gc.GetAction()
+		nextAction := gc.getAction()
 		if nextAction == nil || (nextAction != nil && nextAction.Name != ActionPlaceSettlement) {
 			return errors.New("invalid action")
 		}
@@ -214,7 +214,7 @@ func PlaceRoad(gc *GameContext, validate bool, selectedRoad [2]int) error {
 	}
 
 	if Phase2 == gc.Phase || Phase3 == gc.Phase {
-		nextAction := gc.GetAction()
+		nextAction := gc.getAction()
 		if nextAction == nil || (nextAction != nil && nextAction.Name != ActionPlaceRoad) {
 			return errors.New("invalid action")
 		}
@@ -274,7 +274,7 @@ func HandleRollDice(gc *GameContext) {
 	fmt.Println("Rolled ", sum)
 
 	if sum == 7 {
-		gc.ScheduleAction(ActionDiscardCards)
+		gc.scheduleAction(ActionDiscardCards)
 		return
 	}
 

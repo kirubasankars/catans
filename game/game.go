@@ -35,20 +35,18 @@ func (game *Game) actionLoop() {
 	TimeoutHandler(&game.gameContext)
 }
 
-func (game *Game) Start() {
+func (game *Game) start() {
 	game.startLoop()
 	game.gameContext.startPhase2()
 }
 
-func (game *Game) Stop() {
+func (game *Game) stop() {
 	game.stopLoop()
 }
 
-func (game *Game) UpdateGameSetting(gs GameSetting) {
-	game.gameContext.UpdateGameSetting(gs)
+func (game *Game) UpdateGameSetting(gs GameSetting) error {
+	return game.gameContext.updateGameSetting(gs)
 }
-
-
 
 func NewGame() *Game {
 	game := new(Game)

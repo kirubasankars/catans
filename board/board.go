@@ -3,6 +3,8 @@ package board
 import (
 	"catans/maps"
 	"catans/utils"
+	"fmt"
+	"strings"
 )
 
 type Board struct {
@@ -55,6 +57,25 @@ func (board Board) GetIndices(intersection int) []int {
 		indices = append(indices, n.index)
 	}
 	return indices
+}
+
+func CatNodes(name string) string {
+	b := NewBoard(name)
+	var output []string
+	for i := 0; i < len(b._map.nodes); i ++ {
+		output = append(output, b._map.nodes[i].String())
+	}
+	return strings.Join(output,"\n")
+}
+
+func CatIntersections(name string) string {
+	b := NewBoard(name)
+	var output []string
+	for i := 0; i < len(b._map.coordinators); i ++ {
+		nc :=  b._map.coordinators[i]
+		output = append(output, fmt.Sprint(nc.index, nc, nc.neighbors))
+	}
+	return strings.Join(output,"\n")
 }
 
 func NewBoard(name string) Board {

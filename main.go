@@ -1,17 +1,20 @@
 package main
 
 import (
-	"catans/game"
-	"time"
+	"catans/board"
+	"catans/webserver"
 )
 
 func main() {
-	engine := game.NewGameEngine()
+	board.NewBoard("default")
+	//engine := game.NewGameEngine()
 
-	gs := *new(game.GameSetting)
-	gs.NumberOfPlayers = 3
-	game := engine.CreateGame(gs)
-	engine.Start(game)
+	//gs := *new(game.GameSetting)
+	//gs.Map = "default"
+	//gs.NumberOfPlayers = 3
+	//
+	//gameId := engine.CreateGame(gs)
+	//engine.Start(gameId)
 
-	time.Sleep(60 * time.Minute)
+	webserver.StartWebServer()
 }

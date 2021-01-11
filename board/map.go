@@ -62,7 +62,7 @@ func (_map *Map) build(tileConnections TileConnections) {
 	//_map.coordinators = builder.coordinators
 
 	counter := 0
-	for i := 0; i < 19; i++ {
+	for i := 0; i < len( builder.coordinators); i++ {
 		for j := 0; j < 6; j++ {
 			for _, coordinator := range builder.coordinators {
 				node := coordinator.nodes[0]
@@ -81,9 +81,9 @@ func (_map *Map) build(tileConnections TileConnections) {
 	_map.coordinators = coordinators
 	//fmt.Println(coordinators)
 
-	//for _, ins := range builder.coordinators {
-	//	fmt.Println(ins.index, ins)
-	//}
+	for _, ins := range builder.coordinators {
+		fmt.Println(ins.index, ins, ins.neighbors)
+	}
 
 	//for i := 0; i < len(_map.nodes); i++ {
 	//	fmt.Println(_map.nodes[i])
