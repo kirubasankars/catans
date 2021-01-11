@@ -14,7 +14,7 @@ func TimeoutHandler(gc *GameContext) {
 		return
 	}
 
-	fmt.Println(gc.Phase, gc.Action.Name, gc.GetCurrentPlayer().Id)
+	fmt.Println(gc.Phase, gc.Action.Name, gc.getCurrentPlayer().Id)
 
 	if gc.Phase == Phase2 || gc.Phase == Phase3 {
 		switch playerAction.Name {

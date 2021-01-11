@@ -7,31 +7,31 @@ import (
 )
 
 type GameContext struct {
-	setting GameSetting
-	tiles   []board.Tile
+	tiles   []Tile
 	board   board.Board
 
+	GameSetting
 	GameState
 }
 
-func (gc *GameContext) StartPhase2() {
+func (gc *GameContext) startPhase2() {
 	gc.Phase = Phase2
 	gc.CurrentPlayer = 0
 	gc.ScheduleAction(ActionPlaceSettlement)
 }
 
-func (gc *GameContext) StartPhase3() {
+func (gc *GameContext) startPhase3() {
 	gc.Phase = Phase3
 	gc.ScheduleAction(ActionPlaceSettlement)
 }
 
-func (gc *GameContext) StartPhase4() {
+func (gc *GameContext) startPhase4() {
 	gc.Phase = Phase4
 	gc.CurrentPlayer = 0
 	gc.ScheduleAction(ActionRollDice)
 }
 
-func (gc GameContext) GetCurrentPlayer() *Player {
+func (gc GameContext) getCurrentPlayer() *Player {
 	return gc.Players[gc.CurrentPlayer]
 }
 
@@ -39,12 +39,12 @@ func (gc GameContext) GetGamePhase() string {
 	return gc.Phase
 }
 
-func (gc *GameContext) PutSettlement(settlement Settlement) {
-	gc.GetCurrentPlayer().PutSettlement(settlement)
+func (gc *GameContext) putSettlement(settlement Settlement) {
+	gc.getCurrentPlayer().putSettlement(settlement)
 }
 
-func (gc *GameContext) PutRoad(road [2]int) {
-	gc.GetCurrentPlayer().PutRoad(road)
+func (gc *GameContext) putRoad(road [2]int) {
+	gc.getCurrentPlayer().putRoad(road)
 }
 
 func (gc *GameContext) HandOverCards(player *Player, cardType int, count int) {
@@ -52,14 +52,14 @@ func (gc *GameContext) HandOverCards(player *Player, cardType int, count int) {
 }
 
 func (gc *GameContext) UpdateGameSetting(gs GameSetting) {
-	gc.setting = gs
+	gc.GameSetting = gs
 	for i := 0; i < gs.NumberOfPlayers; i++ {
 		player := NewPlayer()
 		player.Id = i
 		gc.Players = append(gc.Players, player)
 	}
-	gc.tiles = gc.board.GenerateTiles("10MO,2PA,9FO,12FI,6HI,4PA,10HI,9FI,11FO,0DE,3FO,8MO,8FO,3MO,4FI,5PA,5HI,6FI,11PA")
-	gc.board = board.NewBoard()
+	gc.tiles = GenerateTiles("10MO,2PA,9FO,12FI,6HI,4PA,10HI,9FI,11FO,0DE,3FO,8MO,8FO,3MO,4FI,5PA,5HI,6FI,11PA")
+	gc.board = board.NewBoard("default")
 }
 
 func (gc *GameContext) IsInitialSettlementDone() bool {
@@ -67,7 +67,7 @@ func (gc *GameContext) IsInitialSettlementDone() bool {
 	for _, player := range gc.Players {
 		settlementCount = settlementCount + len(player.Settlements)
 	}
-	return settlementCount == (gc.setting.NumberOfPlayers * 2)
+	return settlementCount == (gc.GameSetting.NumberOfPlayers * 2)
 }
 
 func (gc GameContext) GetAction() *Action {
@@ -82,7 +82,7 @@ func (gc *GameContext) EndAction() error {
 
 	fmt.Println("END",gc.GetAction().Name, gc.CurrentPlayer)
 
-	NumberOfPlayers := gc.setting.NumberOfPlayers - 1
+	NumberOfPlayers := gc.GameSetting.NumberOfPlayers - 1
 
 	if Phase4 == gc.Phase {
 		lastAction := gc.GetAction().Name
@@ -120,7 +120,7 @@ func (gc *GameContext) EndAction() error {
 			nextAction = Phase2GetNextAction(*gc)
 		}
 		if nextAction == "" && gc.CurrentPlayer == NumberOfPlayers {
-			gc.StartPhase3()
+			gc.startPhase3()
 		} else {
 			gc.ScheduleAction(nextAction)
 		}
@@ -133,7 +133,7 @@ func (gc *GameContext) EndAction() error {
 			nextAction = Phase3GetNextAction(*gc)
 		}
 		if nextAction == "" && gc.CurrentPlayer == 0 {
-			gc.StartPhase4()
+			gc.startPhase4()
 		} else {
 			gc.ScheduleAction(nextAction)
 		}

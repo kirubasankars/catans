@@ -15,7 +15,7 @@ type Action struct {
 
 func IsActionTimeout(gc GameContext, action Action) bool {
 	timeout := 0
-	if gc.setting.Speed == 0 {
+	if gc.GameSetting.Speed == 0 {
 		switch action.Name {
 		case ActionTurn:
 			timeout = 30
@@ -81,7 +81,7 @@ func GetAvailableIntersections(gc GameContext) ([]int, error) {
 func GetAvailableRoads(gc GameContext) ([][2]int, error) {
 
 	if Phase4 == gc.Phase {
-		currentPlayer := gc.GetCurrentPlayer()
+		currentPlayer := gc.getCurrentPlayer()
 		var usedIntersections = make(map[int]int)
 		for _, settlement := range currentPlayer.Settlements {
 			usedIntersections[settlement.Intersection] = 0
@@ -135,7 +135,7 @@ func GetAvailableRoads(gc GameContext) ([][2]int, error) {
 			if nextAction == nil || (nextAction != nil && nextAction.Name != ActionPlaceRoad) {
 				return nil, errors.New("invalid action")
 			}
-			currentPlayer := gc.GetCurrentPlayer()
+			currentPlayer := gc.getCurrentPlayer()
 
 			var firstSettlement *Settlement
 			if len(currentPlayer.Settlements) > 0 {
@@ -150,7 +150,7 @@ func GetAvailableRoads(gc GameContext) ([][2]int, error) {
 				return nil, errors.New("invalid action")
 			}
 
-			currentPlayer := gc.GetCurrentPlayer()
+			currentPlayer := gc.getCurrentPlayer()
 			var (
 				settlementCounter = 1
 				secondSettlement  *Settlement
@@ -187,13 +187,13 @@ func PlaceSettlement(gc *GameContext, validate bool, selectedIntersection int) e
 		if nextAction == nil || (nextAction != nil && nextAction.Name != ActionPlaceSettlement) {
 			return errors.New("invalid action")
 		}
-		tileIndices := gc.board.GetTileIndex(selectedIntersection)
+		tileIndices := gc.board.GetIndices(selectedIntersection)
 		tokens := make([]int, len(tileIndices))
 		for i, idx := range tileIndices {
 			tokens[i] = gc.tiles[idx].Token
 		}
 		settlement := Settlement{Indices: tileIndices, Tokens: tokens, Intersection: selectedIntersection}
-		gc.PutSettlement(settlement)
+		gc.putSettlement(settlement)
 	}
 
 	return nil
@@ -218,14 +218,14 @@ func PlaceRoad(gc *GameContext, validate bool, selectedRoad [2]int) error {
 		if nextAction == nil || (nextAction != nil && nextAction.Name != ActionPlaceRoad) {
 			return errors.New("invalid action")
 		}
-		gc.PutRoad(selectedRoad)
+		gc.putRoad(selectedRoad)
 	}
 
 	return nil
 }
 
 func Phase2GetNextAction(gc GameContext) string {
-	currentPlayer := gc.GetCurrentPlayer()
+	currentPlayer := gc.getCurrentPlayer()
 	settlementCount := len(currentPlayer.Settlements)
 	roadCount := len(currentPlayer.Roads)
 
@@ -242,7 +242,7 @@ func Phase2GetNextAction(gc GameContext) string {
 }
 
 func Phase3GetNextAction(gc GameContext) string {
-	currentPlayer := gc.GetCurrentPlayer()
+	currentPlayer := gc.getCurrentPlayer()
 	settlementCount := len(currentPlayer.Settlements)
 	roadCount := len(currentPlayer.Roads)
 
@@ -293,7 +293,7 @@ func HandleRollDice(gc *GameContext) {
 	roads, _ := GetAvailableRoads(*gc)
 	_ = roads
 	for _, player := range gc.Players {
-		player.Stat()
+		player.stat()
 	}
 
 }

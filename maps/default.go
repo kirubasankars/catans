@@ -1,20 +1,10 @@
-package board
+package maps
 
 type DefaultMap struct {
 }
 
-func (defaultMap *DefaultMap) Tiles() []int {
-	var nodes []int
-	for _, item := range defaultMap.Connections() {
-		if !defaultMap.contains(nodes, item[0]) {
-			nodes = append(nodes, item[0])
-		}
-	}
-	return nodes
-}
-
-func (defaultMap *DefaultMap) Connections() [][]int {
-	return [][]int{
+func (defaultMap DefaultMap) Connections() [][3]int {
+	return [][3]int{
 		{0, 1, 1},
 		{0, 3, 3},
 		{0, 2, 4},
@@ -117,19 +107,4 @@ func (defaultMap *DefaultMap) Connections() [][]int {
 		{18, 4, 17},
 		{18, 5, 14},
 	}
-}
-
-func (defaultMap *DefaultMap) contains(s []int, e int) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
-
-func GetDefaultMap() Map {
-	gboard := newMap()
-	gboard.build(new(DefaultMap))
-	return gboard
 }

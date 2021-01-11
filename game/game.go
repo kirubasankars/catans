@@ -11,15 +11,6 @@ type Game struct {
 	tickerDone chan bool
 }
 
-func (game *Game) Start() {
-	game.startLoop()
-	game.gameContext.StartPhase2()
-}
-
-func (game *Game) Stop() {
-	game.stopLoop()
-}
-
 func (game *Game) startLoop() {
 	go func() {
 		for {
@@ -44,9 +35,20 @@ func (game *Game) actionLoop() {
 	TimeoutHandler(&game.gameContext)
 }
 
+func (game *Game) Start() {
+	game.startLoop()
+	game.gameContext.startPhase2()
+}
+
+func (game *Game) Stop() {
+	game.stopLoop()
+}
+
 func (game *Game) UpdateGameSetting(gs GameSetting) {
 	game.gameContext.UpdateGameSetting(gs)
 }
+
+
 
 func NewGame() *Game {
 	game := new(Game)

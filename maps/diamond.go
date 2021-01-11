@@ -1,20 +1,9 @@
 package maps
 
-type Map1 struct {
+type Diamond struct {
 }
-
-func (map1 *Map1) Tiles() []int {
-	var nodes []int
-	for _, item := range map1.Connections() {
-		if !map1.contains(nodes, item[0]) {
-			nodes = append(nodes, item[0])
-		}
-	}
-	return nodes
-}
-
-func (map1 *Map1) Connections() [][]int {
-	return [][]int{
+func (diamond Diamond) Connections() [][3]int {
+	return [][3]int{
 		{0, 1, 1},
 		{0, 2, 5},
 
@@ -153,14 +142,3 @@ func (map1 *Map1) Connections() [][]int {
 		{24, 5, 19},
 	}
 }
-
-func (map1 *Map1) contains(s []int, e int) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
-
-

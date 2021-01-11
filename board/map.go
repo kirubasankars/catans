@@ -1,10 +1,12 @@
 package board
 
-import "fmt"
+import (
+	"catans/utils"
+	"fmt"
+)
 
-type MapSetting interface {
-	Tiles() []int
-	Connections() [][]int
+type TileConnections interface {
+	Connections() [][3]int
 }
 
 type Map struct {
@@ -12,14 +14,24 @@ type Map struct {
 	coordinators map[int]*NodeCoordinator
 }
 
-func (_map *Map) build(mapSetting MapSetting) {
-	tiles := mapSetting.Tiles()
+func (_map *Map) uniqueTiles(connections [][3]int) []int {
+	var nodes []int
+	for _, item := range connections {
+		if !utils.Contains(nodes, item[0]) {
+			nodes = append(nodes, item[0])
+		}
+	}
+	return nodes
+}
+
+func (_map *Map) build(tileConnections TileConnections) {
+	tiles := _map.uniqueTiles(tileConnections.Connections())
 	for tile := range tiles {
 		node := NewNode(tile)
 		_map.nodes[tile] = node
 	}
 
-	connections := mapSetting.Connections()
+	connections := tileConnections.Connections()
 	for _, item := range connections {
 		node := _map.nodes[item[0]]
 		neighbor := _map.nodes[item[2]]
@@ -81,8 +93,8 @@ func (_map *Map) build(mapSetting MapSetting) {
 }
 
 func newMap() Map {
-	board := new(Map)
-	board.nodes = make(map[int]*Node)
-	board.coordinators = make(map[int]*NodeCoordinator)
-	return *board
+	_map := new(Map)
+	_map.nodes = make(map[int]*Node)
+	_map.coordinators = make(map[int]*NodeCoordinator)
+	return *_map
 }
