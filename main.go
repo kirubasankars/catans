@@ -1,20 +1,20 @@
 package main
 
 import (
-	"catans/board"
+	"catans/game"
 	"catans/webserver"
 )
 
 func main() {
-	board.NewBoard("default")
-	//engine := game.NewGameEngine()
+	lobby := game.NewLobby()
 
-	//gs := *new(game.GameSetting)
-	//gs.Map = "default"
-	//gs.NumberOfPlayers = 3
-	//
-	//gameId := engine.CreateGame(gs)
-	//engine.Start(gameId)
+	gs := *new(game.GameSetting)
+	gs.Map = "default"
+	gs.NumberOfPlayers = 3
+
+	gameId := lobby.CreateGame(gs)
+	game := lobby.GetGame(gameId)
+	game.Start()
 
 	webserver.StartWebServer()
 }

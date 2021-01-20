@@ -11,7 +11,18 @@ type Board struct {
 	_map 	Map
 }
 
-func (board Board) GetNeighborIntersections(intersection int) [][2]int {
+func (board Board) GetNeighborIntersections1(intersection int) []int {
+	thisIntersection := board._map.coordinators[intersection]
+	neighborIntersections := thisIntersection.neighbors
+	var output []int
+	for _, ins := range neighborIntersections {
+		t := ins.index
+		output = append(output, t)
+	}
+	return output
+}
+
+func (board Board) GetNeighborIntersections2(intersection int) [][2]int {
 	thisIntersection := board._map.coordinators[intersection]
 	neighborIntersections := thisIntersection.neighbors
 	var output [][2]int
@@ -50,7 +61,7 @@ func (board Board) GetAvailableIntersections(occupied []int) []int {
 	return keys
 }
 
-func (board Board) GetIndices(intersection int) []int {
+func (board Board) GetTiles(intersection int) []int {
 	coordinator := board._map.coordinators[intersection]
 	var indices = make([]int, len(coordinator.nodes))
 	for _, n := range coordinator.nodes {
