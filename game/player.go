@@ -12,6 +12,10 @@ type Player struct {
 	Cards       [5]int
 	Roads       [][2]int
 	Settlements []Settlement
+
+	has31  		bool
+	has21		bool
+	cards21 	[5]byte
 }
 
 func (player *Player) putRoad(points [2]int) {

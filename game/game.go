@@ -1,6 +1,7 @@
 package game
 
 import (
+	"errors"
 	"fmt"
 	"time"
 )
@@ -35,7 +36,7 @@ func (game *Game) actionLoop() {
 	//time out, run the next action
 
 	context := game.gameContext
-	if context.getAction() == nil || game.isActionTimeout() {
+	if context == nil || context.getAction() == nil || !game.isActionTimeout() {
 		return
 	}
 
@@ -72,13 +73,29 @@ func (game *Game) actionLoop() {
 	}
 }
 
-func (game *Game) Start() {
+func (game *Game) Start() error {
+	if game.gameContext.Phase != Phase1 {
+		return errors.New("invalid operation")
+	}
 	game.startLoop()
 	game.startPhase2()
+	return nil
 }
 
 func (game *Game) Stop() {
 	game.stopLoop()
+}
+
+
+
+
+
+func (game *Game) Trade(gives [][2]int, wants [][2]int) error {
+	return game.gameContext.setupTrade(gives, wants)
+}
+
+func (game *Game) OverrideTrade(tradeID int, gives [][2]int, wants [][2]int) error {
+	return game.gameContext.overrideTrade(tradeID, gives, wants)
 }
 
 func (game *Game) UpdateGameSetting(gs GameSetting) error {
@@ -137,12 +154,15 @@ func (game *Game) phase3GetNextAction() string {
 
 func (game *Game) endAction() error {
 	context := game.gameContext
-	fmt.Println("END", context.getAction().Name, context.CurrentPlayer)
+	fmt.Println("END", context.getActionString(), context.CurrentPlayer)
 
 	NumberOfPlayers := context.GameSetting.NumberOfPlayers - 1
 
 	if Phase4 == context.Phase {
-		lastAction := context.getAction().Name
+		//clean up trades
+		game.gameContext.trades = []GameTrade{}
+
+		lastAction := context.getActionString()
 
 		if lastAction == ActionDiscardCards {
 			game.scheduleAction(ActionPlaceRobber)
@@ -258,4 +278,13 @@ func NewGame() *Game {
 type Action struct {
 	Name    string
 	Timeout time.Time
+}
+
+type GameTrade struct {
+	ID          int
+	PlayerID    int
+	Gives       [][2]int
+	Wants       [][2]int
+	HasAllCards bool
+	OK          bool
 }
