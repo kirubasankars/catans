@@ -1,7 +1,7 @@
 package game
 
 type GameSetting struct {
-	NumberOfPlayers 	int
-	Speed 				int
-	Map       			string
+	NumberOfPlayers int
+	Speed           int
+	Map             string
 }

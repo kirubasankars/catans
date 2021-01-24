@@ -15,8 +15,6 @@ type Settlement struct {
 }
 
 type Road struct {
-	Points    [2]int
-	player    *Player
+	Points [2]int
+	player *Player
 }
-
-

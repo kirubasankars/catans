@@ -8,7 +8,7 @@ import (
 )
 
 type Board struct {
-	_map 	Map
+	_map Map
 }
 
 func (board Board) GetNeighborIntersections1(intersection int) []int {
@@ -73,20 +73,20 @@ func (board Board) GetTiles(intersection int) []int {
 func CatNodes(name string) string {
 	b := NewBoard(name)
 	var output []string
-	for i := 0; i < len(b._map.nodes); i ++ {
+	for i := 0; i < len(b._map.nodes); i++ {
 		output = append(output, b._map.nodes[i].String())
 	}
-	return strings.Join(output,"\n")
+	return strings.Join(output, "\n")
 }
 
 func CatIntersections(name string) string {
 	b := NewBoard(name)
 	var output []string
-	for i := 0; i < len(b._map.coordinators); i ++ {
-		nc :=  b._map.coordinators[i]
+	for i := 0; i < len(b._map.coordinators); i++ {
+		nc := b._map.coordinators[i]
 		output = append(output, fmt.Sprint(nc.index, nc, nc.neighbors))
 	}
-	return strings.Join(output,"\n")
+	return strings.Join(output, "\n")
 }
 
 func NewBoard(name string) Board {
@@ -97,7 +97,7 @@ func NewBoard(name string) Board {
 	if name == "diamond" {
 		_map.build(maps.Diamond{})
 	}
-	board := new (Board)
-	board._map = _map 
+	board := new(Board)
+	board._map = _map
 	return *board
 }

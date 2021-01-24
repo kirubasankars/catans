@@ -3,7 +3,7 @@ package game
 import "fmt"
 
 type GameEngine struct {
-	games 		map[string]Game
+	games       map[string]Game
 	gameCounter int
 }
 

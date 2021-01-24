@@ -7,7 +7,7 @@ import (
 
 func TestLongestRoad1(t *testing.T) {
 	player := new(Player)
-	roads := [][2]int {
+	roads := [][2]int{
 		{27, 28},
 		{28, 29},
 		{29, 39},
@@ -46,7 +46,7 @@ func TestLongestRoad1(t *testing.T) {
 
 func TestLongestRoad2(t *testing.T) {
 	player := new(Player)
-	roads := [][2]int {
+	roads := [][2]int{
 		//{38, 48},
 		//{39, 40},
 		//{18, 19},

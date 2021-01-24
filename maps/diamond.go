@@ -2,6 +2,7 @@ package maps
 
 type Diamond struct {
 }
+
 func (diamond Diamond) Connections() [][3]int {
 	return [][3]int{
 		{0, 1, 1},

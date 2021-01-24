@@ -138,8 +138,7 @@ func (cb CoordinatorBuilder) MakeIntersectionsConnected(nodes map[int]*Node) {
 }
 
 func NewCoordinatorBuilder() *CoordinatorBuilder {
-	cb := new (CoordinatorBuilder)
+	cb := new(CoordinatorBuilder)
 	cb.coordinators = make(map[string]*NodeCoordinator)
 	return cb
 }
-

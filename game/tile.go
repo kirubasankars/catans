@@ -14,13 +14,13 @@ type Tile struct {
 func ConvertTerrainToCardType(terrain string) int {
 	switch terrain {
 	case "FO":
-		return  0
+		return 0
 	case "HI":
-		return  1
+		return 1
 	case "PA":
-		return  2
+		return 2
 	case "FI":
-		return  3
+		return 3
 	case "MO":
 		return 4
 	}

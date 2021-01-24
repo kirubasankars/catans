@@ -12,18 +12,21 @@ type Player struct {
 	Cards       [5]int
 	Roads       [][2]int
 	Settlements []Settlement
+	DevCards    []int
 
-	has31  		bool
-	has21		bool
-	cards21 	[5]byte
+	has31   bool
+	has21   bool
+	cards21 [5]byte
 }
 
-func (player *Player) putRoad(points [2]int) {
+func (player *Player) putRoad(points [2]int) error {
 	player.Roads = append(player.Roads, points)
+	return nil
 }
 
-func (player *Player) putSettlement(settlement Settlement) {
+func (player *Player) putSettlement(settlement Settlement) error {
 	player.Settlements = append(player.Settlements, settlement)
+	return nil
 }
 
 func (player Player) stat() {
@@ -37,8 +40,8 @@ func (player Player) stat() {
 
 type path struct {
 	intersection int
-	visited [][2]int
-	length  int
+	visited      [][2]int
+	length       int
 }
 
 func (player Player) calculateLongestRoad(otherPlayersSettlements []int) int {
@@ -48,7 +51,7 @@ func (player Player) calculateLongestRoad(otherPlayersSettlements []int) int {
 
 	for _, node := range roadNodes {
 
-		pending.PushBack(path{ intersection: node, length: 0, visited: [][2]int{}})
+		pending.PushBack(path{intersection: node, length: 0, visited: [][2]int{}})
 
 		fmt.Println("FROM", node)
 
@@ -64,30 +67,29 @@ func (player Player) calculateLongestRoad(otherPlayersSettlements []int) int {
 			for _, road := range player.Roads {
 
 				if road[0] == item.intersection || road[1] == item.intersection {
-						////broken road check
-						//if otherPlayersSettlements != nil && utils.Contains(otherPlayersSettlements, r1) {
-						//	pathEnd = true
-						//}
+					////broken road check
+					//if otherPlayersSettlements != nil && utils.Contains(otherPlayersSettlements, r1) {
+					//	pathEnd = true
+					//}
 
-						p := -1
-						if road[0] == item.intersection {
-							p = road[1]
-						} else {
-							p = road[0]
-						}
+					p := -1
+					if road[0] == item.intersection {
+						p = road[1]
+					} else {
+						p = road[0]
+					}
 
-
-						visited := false
-						for _, v := range item.visited {
-							if v[0] == road[0] && v[1] == road[1] {
-								visited = true
-							}
+					visited := false
+					for _, v := range item.visited {
+						if v[0] == road[0] && v[1] == road[1] {
+							visited = true
 						}
-						if !visited {
-							pathEnd = false
-							item.visited = append(item.visited, road)
-							pending.PushBack(path{intersection: p, length: item.length + 1, visited: item.visited})
-						}
+					}
+					if !visited {
+						pathEnd = false
+						item.visited = append(item.visited, road)
+						pending.PushBack(path{intersection: p, length: item.length + 1, visited: item.visited})
+					}
 
 				}
 			}

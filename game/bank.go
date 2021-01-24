@@ -1,12 +1,16 @@
 package game
 
-import "errors"
+import (
+	"errors"
+	"math/rand"
+	"thayam/utils"
+)
 
 type Bank struct {
 	cards    [5]int
 	devCards []int
 
-	t 		*Bank
+	t *Bank
 }
 
 func (bank *Bank) Begin() {
@@ -22,6 +26,7 @@ func (bank *Bank) Commit() {
 func (bank *Bank) Rollback() {
 	bank.cards = bank.t.cards
 	bank.devCards = bank.t.devCards
+	bank.t = nil
 }
 
 func (bank *Bank) Give(cardType int, count int) (int, error) {
@@ -47,12 +52,15 @@ func (bank *Bank) Return(cardType int, count int) error {
 	return nil
 }
 
-func (bank *Bank) Trade() {
-
+func (bank *Bank) BuyDevCard() int {
+	r := rand.Intn(len(bank.devCards) + 1)
+	defer utils.Remove(bank.devCards, r)
+	return bank.devCards[r]
 }
 
 func NewBank() *Bank {
 	bank := new(Bank)
-	bank.cards = [5]int{19,19,19,19,19}
+	bank.cards = [5]int{19, 19, 19, 19, 19}
+	bank.devCards = []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 3, 3, 4, 4}
 	return bank
 }
