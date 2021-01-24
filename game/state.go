@@ -2,7 +2,7 @@ package game
 
 type GameState struct {
 	Phase         string
-	Action        Action
+	Action        gameAction
 	Bank          *Bank
 	CurrentPlayer int
 	Players       []*Player
