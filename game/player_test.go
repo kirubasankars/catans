@@ -37,7 +37,7 @@ func TestLongestRoad1(t *testing.T) {
 
 	size := player.calculateLongestRoad(nil)
 
-	if size != 10 {
+	if size != 8 {
 		t.Error("something wrong")
 		t.Fail()
 	}

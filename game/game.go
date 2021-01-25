@@ -6,7 +6,7 @@ import (
 )
 
 type Game struct {
-	context *GameContext
+	context *gameContext
 
 	ticker     *time.Ticker
 	tickerDone chan bool
@@ -73,6 +73,22 @@ func (game Game) CompleteTrade(tradeID int) error {
 
 func (game Game) CurrentPlayer() int {
 	return game.context.CurrentPlayer
+}
+
+func (game Game) GetPossibleSettlementLocations() ([]int, error) {
+	return game.context.getPossibleSettlementLocations()
+}
+
+func (game Game) GetPossibleRoads() ([][2]int, error) {
+	return game.context.getPossibleRoads()
+}
+
+func (game Game) PutRoad(road [2]int) error {
+	return game.context.putRoad(true, road)
+}
+
+func (game Game) PutSettlement(intersection int) error {
+	return game.context.putSettlement(true, intersection)
 }
 
 func (game *Game) run() {
