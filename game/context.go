@@ -3,6 +3,7 @@ package game
 import (
 	"catans/board"
 	"catans/utils"
+	"container/list"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -401,9 +402,9 @@ func (context *gameContext) setupTrade(gives [][2]int, wants [][2]int) error {
 	return nil
 }
 
-func (context *gameContext) overrideTrade(tradeID int, gives [][2]int, wants [][2]int) error {
+func (context *gameContext) overrideTrade(playerID, tradeID int, gives [][2]int, wants [][2]int) error {
 	var trade = context.getTrade(tradeID)
-	if trade == nil || !context.isSafeTrade(gives, wants) || !context.isPlayerHasAllCards(trade.To, gives) {
+	if trade == nil || !context.isSafeTrade(gives, wants) || playerID != trade.To || !context.isPlayerHasAllCards(trade.To, gives) {
 		return errors.New(utils.ErrInvalidOperation)
 	}
 
@@ -423,18 +424,18 @@ func (context *gameContext) overrideTrade(tradeID int, gives [][2]int, wants [][
 	return nil
 }
 
-func (context *gameContext) acceptTrade(tradeID int) error {
+func (context *gameContext) acceptTrade(playerID, tradeID int) error {
 	trade := context.getTrade(tradeID)
-	if trade == nil || trade.OK != 0 {
+	if trade == nil || trade.OK != 0 || playerID != trade.To {
 		return errors.New(utils.ErrInvalidOperation)
 	}
 	trade.OK = 1
 	return nil
 }
 
-func (context *gameContext) rejectTrade(tradeID int) error {
+func (context *gameContext) rejectTrade(playerID, tradeID int) error {
 	trade := context.getTrade(tradeID)
-	if trade == nil || trade.OK != 0 {
+	if trade == nil || trade.OK != 0 || playerID != trade.To {
 		return errors.New(utils.ErrInvalidOperation)
 	}
 	trade.OK = -1
@@ -685,6 +686,68 @@ func (context *gameContext) randomPlaceInitialRoad() error {
 	availableRoads, _ := context.getPossibleRoads()
 	selectedRoad := availableRoads[rand.Intn(len(availableRoads))]
 	return context.putRoad(false, selectedRoad)
+}
+
+func (context gameContext) calculateLongestRoad(player Player, otherPlayersSettlements []int) int {
+	roadNodes := player.uniqueRoadNodes()
+	pending := list.New()
+	longest := 0
+
+	for _, node := range roadNodes {
+
+		pending.PushBack(path{intersection: node, length: 0, visited: [][2]int{}})
+
+		fmt.Println("FROM", node)
+
+		for pending.Len() > 0 {
+
+			var pathEnd = true
+
+			el := pending.Front()
+			pending.Remove(el)
+
+			item := el.Value.(path)
+
+			for _, road := range player.Roads {
+
+				if road[0] == item.intersection || road[1] == item.intersection {
+					////broken road check
+					//if otherPlayersSettlements != nil && utils.Contains(otherPlayersSettlements, r1) {
+					//	pathEnd = true
+					//}
+
+					p := -1
+					if road[0] == item.intersection {
+						p = road[1]
+					} else {
+						p = road[0]
+					}
+
+					visited := false
+					for _, v := range item.visited {
+						if v[0] == road[0] && v[1] == road[1] {
+							visited = true
+						}
+					}
+					if !visited {
+						pathEnd = false
+						item.visited = append(item.visited, road)
+						pending.PushBack(path{intersection: p, length: item.length + 1, visited: item.visited})
+					}
+
+				}
+			}
+
+			if pathEnd {
+				fmt.Println("Path End", item)
+				if longest < item.length {
+					longest = item.length
+				}
+			}
+		}
+	}
+
+	return longest
 }
 
 func (context *gameContext) randomDiscardCards() {

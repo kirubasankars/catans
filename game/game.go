@@ -55,16 +55,16 @@ func (game Game) SetupTrade(gives [][2]int, wants [][2]int) error {
 	return game.context.setupTrade(gives, wants)
 }
 
-func (game Game) OverrideTrade(tradeID int, gives [][2]int, wants [][2]int) error {
-	return game.context.overrideTrade(tradeID, gives, wants)
+func (game Game) OverrideTrade(playerID, tradeID int, gives [][2]int, wants [][2]int) error {
+	return game.context.overrideTrade(playerID, tradeID, gives, wants)
 }
 
-func (game Game) AcceptTrade(tradeID int) error {
-	return game.context.acceptTrade(tradeID)
+func (game Game) AcceptTrade(playerID, tradeID int) error {
+	return game.context.acceptTrade(playerID, tradeID)
 }
 
-func (game Game) RejectTrade(tradeID int) error {
-	return game.context.rejectTrade(tradeID)
+func (game Game) RejectTrade(playerID, tradeID int) error {
+	return game.context.rejectTrade(playerID, tradeID)
 }
 
 func (game Game) CompleteTrade(tradeID int) error {
