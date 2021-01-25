@@ -125,11 +125,6 @@ func (game *Game) run() {
 			game.RollDice()
 		}
 	}
-
-	err := context.endAction()
-	if err != nil {
-		fmt.Println(err)
-	}
 }
 
 func NewGame() *Game {

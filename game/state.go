@@ -3,7 +3,7 @@ package game
 type GameState struct {
 	Phase         string
 	Action        gameAction
-	Bank          *Bank
+	Bank          *bank
 	CurrentPlayer int
 	Players       []*Player
 }

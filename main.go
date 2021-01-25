@@ -9,10 +9,9 @@ func main() {
 	lobby := game.NewLobby()
 
 	gs := *new(game.GameSetting)
-	gs.Map = "default"
 	gs.NumberOfPlayers = 3
 
-	gameId := lobby.CreateGame(gs)
+	gameId, _ := lobby.CreateGame(gs)
 	game := lobby.GetGame(gameId)
 	game.Start()
 

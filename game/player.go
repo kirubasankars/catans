@@ -32,7 +32,7 @@ func (player *Player) putSettlement(settlement Settlement) error {
 func (player Player) stat() {
 	var lines []string
 	for idx, count := range player.Cards {
-		name := ConvertCardTypeToName(idx)
+		name := convertCardTypeToName(idx)
 		lines = append(lines, fmt.Sprintf("%s:%d", name, count))
 	}
 	fmt.Println(player.ID, strings.Join(lines, ", "))

@@ -64,14 +64,14 @@ func (board Board) GetAvailableIntersections(occupied []int) []int {
 func (board Board) GetTiles(intersection int) []int {
 	coordinator := board._map.coordinators[intersection]
 	var indices = make([]int, len(coordinator.nodes))
-	for _, n := range coordinator.nodes {
-		indices = append(indices, n.index)
+	for idx, n := range coordinator.nodes {
+		indices[idx] = n.index
 	}
 	return indices
 }
 
-func CatNodes(name string) string {
-	b := NewBoard(name)
+func CatNodes(ID int) string {
+	b := NewBoard(ID)
 	var output []string
 	for i := 0; i < len(b._map.nodes); i++ {
 		output = append(output, b._map.nodes[i].String())
@@ -79,8 +79,8 @@ func CatNodes(name string) string {
 	return strings.Join(output, "\n")
 }
 
-func CatIntersections(name string) string {
-	b := NewBoard(name)
+func CatIntersections(ID int) string {
+	b := NewBoard(ID)
 	var output []string
 	for i := 0; i < len(b._map.coordinators); i++ {
 		nc := b._map.coordinators[i]
@@ -89,12 +89,12 @@ func CatIntersections(name string) string {
 	return strings.Join(output, "\n")
 }
 
-func NewBoard(name string) Board {
+func NewBoard(ID int) Board {
 	_map := newMap()
-	if name == "default" {
+	if ID == 0 {
 		_map.build(maps.DefaultMap{})
 	}
-	if name == "diamond" {
+	if ID == 1 {
 		_map.build(maps.Diamond{})
 	}
 	board := new(Board)

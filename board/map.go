@@ -2,7 +2,6 @@ package board
 
 import (
 	"catans/utils"
-	"fmt"
 )
 
 type TileConnections interface {
@@ -81,15 +80,15 @@ func (_map *Map) build(tileConnections TileConnections) {
 	_map.coordinators = coordinators
 	//fmt.Println(coordinators)
 
-	for _, ins := range builder.coordinators {
-		fmt.Println(ins.index, ins, ins.neighbors)
-	}
+	//for _, ins := range builder.coordinators {
+	//	fmt.Println(ins.index, ins, ins.neighbors)
+	//}
 
 	//for i := 0; i < len(_map.nodes); i++ {
 	//	fmt.Println(_map.nodes[i])
 	//}
 
-	fmt.Println("")
+	//fmt.Println("")
 }
 
 func newMap() Map {

@@ -7,12 +7,14 @@ type GameEngine struct {
 	gameCounter int
 }
 
-func (ge GameEngine) CreateGame(gs GameSetting) string {
+func (ge GameEngine) CreateGame(gs GameSetting) (string, error) {
 	game := NewGame()
 	id := fmt.Sprintf("GAME#%d", ge.gameCounter)
 	ge.games[id] = *game
-	game.UpdateGameSetting(gs)
-	return id
+	if err := game.UpdateGameSetting(gs); err != nil {
+		return "", err
+	}
+	return id, nil
 }
 
 func (ge GameEngine) GetGame(gameID string) Game {
