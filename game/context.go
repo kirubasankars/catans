@@ -70,9 +70,8 @@ func (context *gameContext) putSettlement(validate bool, intersection int) error
 		}
 		settlement = Settlement{Indices: tileIndices, Tokens: tokens, Intersection: intersection}
 
-		if err := context.getCurrentPlayer().putSettlement(settlement); err != nil {
-			return err
-		}
+		currentPlayer := context.getCurrentPlayer()
+		currentPlayer.Settlements = append(currentPlayer.Settlements, settlement)
 		return context.endAction()
 	}
 
@@ -235,6 +234,11 @@ func (context *gameContext) getPossibleSettlementLocations() ([]int, error) {
 }
 
 func (context *gameContext) putRoad(validate bool, road [2]int) error {
+	if road[0] > road[1] {
+		s := road[1]
+		road[1] = road[0]
+		road[0] = s
+	}
 	if validate {
 		availableRoads, _ := context.getPossibleRoads()
 		matched := false
@@ -253,9 +257,8 @@ func (context *gameContext) putRoad(validate bool, road [2]int) error {
 		if context.getActionString() != ActionPlaceRoad {
 			return errors.New(utils.ErrInvalidOperation)
 		}
-		if err := context.getCurrentPlayer().putRoad(road); err != nil {
-			return err
-		}
+		currentPlayer := context.getCurrentPlayer()
+		currentPlayer.Roads = append(currentPlayer.Roads, road)
 		return context.endAction()
 	}
 	return nil
@@ -316,8 +319,8 @@ func (context *gameContext) bankTrade(gives, wants [][2]int) error {
 		giveCardType := gives[0][0]
 		giveTradeCount := gives[0][1]
 
-		if currentPlayer.has21 || currentPlayer.has31 {
-			if currentPlayer.has21 && currentPlayer.cards21[giveCardType] == 1 && giveTradeCount == 2 {
+		if currentPlayer.ownPort21 || currentPlayer.ownPort31 {
+			if currentPlayer.ownPort21 && currentPlayer.ports21[giveCardType] == 1 && giveTradeCount == 2 {
 				if err := bank.Return(giveCardType, giveTradeCount); err != nil {
 					bank.Rollback()
 					return err
@@ -328,7 +331,7 @@ func (context *gameContext) bankTrade(gives, wants [][2]int) error {
 				}
 				currentPlayer.Cards[giveCardType] = -2
 				currentPlayer.Cards[wantCardType]++
-			} else if currentPlayer.has31 && giveTradeCount == 3 {
+			} else if currentPlayer.ownPort31 && giveTradeCount == 3 {
 				if err := bank.Return(giveCardType, giveTradeCount); err != nil {
 					bank.Rollback()
 					return err
@@ -634,7 +637,7 @@ func (context *gameContext) isActionTimeout() bool {
 		}
 	}
 	durationSeconds := time.Now().Sub(action.Timeout).Seconds()
-	if int(durationSeconds) < timeout {
+	if int(durationSeconds) > timeout {
 		return false
 	}
 	return true

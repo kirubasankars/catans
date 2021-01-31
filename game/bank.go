@@ -3,6 +3,7 @@ package game
 import (
 	"catans/utils"
 	"errors"
+	"math/rand"
 )
 
 type bank struct {
@@ -62,5 +63,9 @@ func NewBank() *bank {
 	bank := new(bank)
 	bank.cards = [5]int{19, 19, 19, 19, 19}
 	bank.devCards = []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 3, 3, 4, 4}
+	for i := len(bank.devCards) - 1; i > 0; i-- {
+		j := rand.Intn(i + 1)
+		bank.devCards[i], bank.devCards[j] = bank.devCards[j], bank.devCards[i]
+	}
 	return bank
 }

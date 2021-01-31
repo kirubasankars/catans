@@ -13,19 +13,9 @@ type Player struct {
 	Settlements []Settlement
 	DevCards    []int
 
-	has31   bool
-	has21   bool
-	cards21 [5]byte
-}
-
-func (player *Player) putRoad(points [2]int) error {
-	player.Roads = append(player.Roads, points)
-	return nil
-}
-
-func (player *Player) putSettlement(settlement Settlement) error {
-	player.Settlements = append(player.Settlements, settlement)
-	return nil
+	ownPort31 bool
+	ownPort21 bool
+	ports21   [5]byte
 }
 
 func (player Player) stat() {

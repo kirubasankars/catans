@@ -16,6 +16,10 @@ func (game *Game) UpdateGameSetting(gs GameSetting) error {
 	return game.context.updateGameSetting(gs)
 }
 
+func (game *Game) getPlayer(playerID int) Player {
+	return *game.context.Players[playerID]
+}
+
 func (game *Game) Start() error {
 	if err := game.context.startPhase2(); err != nil {
 		return err
