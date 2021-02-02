@@ -24,7 +24,9 @@ func (game *Game) Start() error {
 	if err := game.context.startPhase2(); err != nil {
 		return err
 	}
-
+	if !game.context.TurnTimeOut {
+		return nil
+	}
 	go func() {
 		for {
 			select {
@@ -49,6 +51,10 @@ func (game *Game) RollDice() error {
 	dice1, dice2 := RandomDice()
 	sum := dice1 + dice2
 	return game.context.handleDice(sum)
+}
+
+func (game *Game) UI() string {
+	return game.context.board.JSON()
 }
 
 func (game Game) BankTrade(gives [][2]int, wants [][2]int) error {

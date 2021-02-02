@@ -1,24 +1,28 @@
 package webserver
 
 import (
-	"catans/board"
+	"catans/game"
 	"fmt"
 	"log"
 	"net/http"
 )
 
 func StartWebServer() {
-	http.HandleFunc("/board", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, board.CatNodes(0))
+	lobby := game.NewLobby()
+
+	http.HandleFunc("/create_game", func(w http.ResponseWriter, r *http.Request) {
+		gs := game.GameSetting{NumberOfPlayers: 2}
+		gameID, _ := lobby.CreateGame(gs)
+		w.Write([]byte(gameID))
 	})
 
-	http.HandleFunc("/intersections", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, board.CatIntersections(0))
+	http.HandleFunc("/ui", func(w http.ResponseWriter, r *http.Request) {
+		game := lobby.GetGame("GAME#1")
+		w.Write([]byte(game.UI()))
 	})
 
 	fmt.Printf("Starting server at port 8080\n")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatal(err)
 	}
-
 }

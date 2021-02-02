@@ -11,6 +11,7 @@ func TestGame1(t *testing.T) {
 	gs := *new(GameSetting)
 	gs.Map = 0
 	gs.NumberOfPlayers = 2
+	gs.TurnTimeOut = false
 	game.UpdateGameSetting(gs)
 	game.Start()
 

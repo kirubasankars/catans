@@ -26,7 +26,7 @@ type gameTrade struct {
 }
 
 type gameContext struct {
-	tiles        []tile
+	tiles        [][2]int
 	board        board.Board
 	tradeCounter int
 	trades       []*gameTrade
@@ -46,13 +46,7 @@ func (context gameContext) getGamePhase() string {
 func (context *gameContext) putSettlement(validate bool, intersection int) error {
 	if validate {
 		availableIntersections, _ := context.getPossibleSettlementLocations()
-		matched := false
-		for _, availableIntersection := range availableIntersections {
-			if availableIntersection == intersection {
-				matched = true
-			}
-		}
-		if !matched {
+		if !utils.Contains(availableIntersections, intersection) {
 			return errors.New(utils.ErrInvalidOperation)
 		}
 	}
@@ -63,10 +57,10 @@ func (context *gameContext) putSettlement(validate bool, intersection int) error
 		if context.getActionString() != ActionPlaceSettlement {
 			return errors.New(utils.ErrInvalidOperation)
 		}
-		tileIndices := context.board.GetTiles(intersection)
+		tileIndices := context.board.GetTileIndices(intersection)
 		tokens := make([]int, len(tileIndices))
 		for i, idx := range tileIndices {
-			tokens[i] = context.tiles[idx].Token
+			tokens[i] = context.tiles[idx][1]
 		}
 		settlement = Settlement{Indices: tileIndices, Tokens: tokens, Intersection: intersection}
 
@@ -278,8 +272,8 @@ func (context *gameContext) updateGameSetting(gs GameSetting) error {
 		player.ID = i
 		context.Players = append(context.Players, player)
 	}
-	context.tiles = generateTiles("10MO,2PA,9FO,12FI,6HI,4PA,10HI,9FI,11FO,0DE,3FO,8MO,8FO,3MO,4FI,5PA,5HI,6FI,11PA")
 	context.board = board.NewBoard(gs.Map)
+	context.tiles = context.board.GetTiles()
 	return nil
 }
 
@@ -645,7 +639,14 @@ func (context *gameContext) isActionTimeout() bool {
 
 func (context *gameContext) handleDice(dice int) error {
 	if dice == 7 {
-		context.scheduleAction(ActionDiscardCards)
+		for _, player := range context.Players {
+			if len(player.Cards) > context.DiscardCardLimit {
+				context.scheduleAction(ActionDiscardCards)
+				break
+			} else {
+				context.scheduleAction(ActionPlaceRobber)
+			}
+		}
 		return nil
 	}
 
@@ -660,7 +661,7 @@ func (context *gameContext) handleDice(dice int) error {
 		for _, settlement := range player.Settlements {
 			for idx, token := range settlement.Tokens {
 				if token == dice {
-					terrain := context.tiles[settlement.Indices[idx]].Terrain
+					terrain := context.tiles[settlement.Indices[idx]][0]
 					count, err := context.Bank.Give(terrain, 1)
 					if err != nil {
 						bank.Rollback()

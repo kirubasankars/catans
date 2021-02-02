@@ -3,21 +3,18 @@ package board
 import (
 	"catans/maps"
 	"catans/utils"
-	"encoding/json"
 	"fmt"
-	"regexp"
-	"strconv"
 	"strings"
 )
 
 type Board struct {
-	_map Map
+	g *grid
 }
 
 func (board Board) GetNeighborIntersections1(intersection int) []int {
-	thisIntersection := board._map.coordinators[intersection]
+	thisIntersection := board.g.intersections[intersection]
 	neighborIntersections := thisIntersection.neighbors
-	var output []int
+	var output = make([]int, len(thisIntersection.neighbors))
 	for _, ins := range neighborIntersections {
 		t := ins.index
 		output = append(output, t)
@@ -26,28 +23,21 @@ func (board Board) GetNeighborIntersections1(intersection int) []int {
 }
 
 func (board Board) GetNeighborIntersections2(intersection int) [][2]int {
-	thisIntersection := board._map.coordinators[intersection]
+	thisIntersection := board.g.intersections[intersection]
 	neighborIntersections := thisIntersection.neighbors
-	var output [][2]int
+	var output = make([][2]int, len(thisIntersection.neighbors))
 	for _, ins := range neighborIntersections {
-		t := ins.index
-		if thisIntersection.nodes[0].index == ins.nodes[0].index {
-			if thisIntersection.sides[0] < ins.sides[0] {
-				output = append(output, [2]int{intersection, t})
-			} else {
-				output = append(output, [2]int{t, intersection})
-			}
-		} else if thisIntersection.nodes[0].index < ins.nodes[0].index {
-			output = append(output, [2]int{intersection, t})
+		if ins.index < intersection {
+			output = append(output, [2]int{ins.index, intersection})
 		} else {
-			output = append(output, [2]int{t, intersection})
+			output = append(output, [2]int{intersection, ins.index})
 		}
 	}
 	return output
 }
 
 func (board Board) GetAvailableIntersections(occupied []int) []int {
-	intersections := board._map.coordinators
+	intersections := board.g.intersections
 	l := len(occupied)
 	for i := 0; i < l; i++ {
 		occupiedNeighbors := intersections[occupied[i]].neighbors
@@ -64,8 +54,8 @@ func (board Board) GetAvailableIntersections(occupied []int) []int {
 	return keys
 }
 
-func (board Board) GetTiles(intersection int) []int {
-	coordinator := board._map.coordinators[intersection]
+func (board Board) GetTileIndices(intersection int) []int {
+	coordinator := board.g.intersections[intersection]
 	var indices = make([]int, len(coordinator.nodes))
 	for idx, n := range coordinator.nodes {
 		indices[idx] = n.index
@@ -73,142 +63,62 @@ func (board Board) GetTiles(intersection int) []int {
 	return indices
 }
 
-type Hexagon struct {
-	NodeID        int               `json:"node_id"`
-	Token         int				`json:"token"`
-	Terrain       string			`json:"terrain"`
-	Neighbors     []HexagonNeighbor `json:"neighbors,omitempty"`
-	Intersections []HexagonIntersection `json:"intersections,omitempty"`
-}
-
-type HexagonIntersection struct {
-	IntersectionID int `json:"intersection_id"`
-	Side   		   int `json:"side"`
-}
-
-type HexagonNeighbor struct {
-	NodeID int `json:"node_id"`
-	Side   int `json:"side"`
-}
-
-func (board Board) GetUINodes() {
-	var hexMap []Hexagon
-	var visitedNodes = make(map[int]bool)
-	var visitedintersections = make(map[int]bool)
-
-	tiles := generateTiles("10MO,2PA,9FO,12FI,6HI,4PA,10HI,9FI,11FO,0DE,3FO,8MO,8FO,3MO,4FI,5PA,5HI,6FI,11PA")
-
-	for i := 0; i < len(board._map.nodes); i++ {
-		node := board._map.nodes[i]
-		tile := tiles[i]
-		var hex Hexagon
-		hex.Token = tile.Token
-		hex.Terrain = convertCardTypeToName(tile.Terrain)
-		hex.NodeID = node.index
-		for side, n := range node.neighbors {
-			if _, ok := visitedNodes[n.index]; !ok {
-				hex.Neighbors = append(hex.Neighbors, HexagonNeighbor{n.index, side})
-				visitedNodes[n.index] = true
-			}
-			visitedNodes[node.index] = true
+func (board Board) GetTiles() [][2]int {
+	var tiles = make([][2]int, len(board.g.grid))
+	var chits = []int{10, 2, 9, 12, 6, 4, 10, 9, 11, 3, 8, 8, 3, 4, 5, 5, 6, 11}
+	var tIndex = 0
+	for idx, n := range board.g.grid {
+		var rt = -1
+		var token = -1
+		switch n.resource {
+		case "t":
+			rt = 0
+		case "m":
+			rt = 1
+		case "f":
+			rt = 2
+		case "p":
+			rt = 3
+		case "h":
+			rt = 4
+		default:
+			rt = -1
 		}
-
-		for side, i := range node.coordinators {
-			if _, ok := visitedintersections[i.index]; !ok {
-				hex.Intersections = append(hex.Intersections, HexagonIntersection{i.index, side})
-				visitedintersections[i.index] = true
-			}
+		if rt != -1 {
+			token = chits[tIndex]
+			tIndex++
 		}
-
-		hexMap = append(hexMap, hex)
-	}
-
-	s, _ := json.Marshal(hexMap)
-
-	fmt.Println(string(s))
-}
-
-type tile struct {
-	Token   int
-	Terrain int
-}
-
-func convertTerrainToCardType(terrain string) int {
-	switch terrain {
-	case "FO":
-		return 0
-	case "HI":
-		return 1
-	case "PA":
-		return 2
-	case "FI":
-		return 3
-	case "MO":
-		return 4
-	}
-	return -1
-}
-
-func convertCardTypeToName(cardType int) string {
-	switch cardType {
-	case 0:
-		return "Log"
-	case 1:
-		return "Brick"
-	case 2:
-		return "Wool"
-	case 3:
-		return "Grain"
-	case 4:
-		return "Ore"
-	}
-	return ""
-}
-
-func generateTiles(tileSettings string) []tile {
-	r := regexp.MustCompile(`(?P<Token>\d+)(?P<Terrain>\w+)?`)
-	segs := strings.Split(tileSettings, ",")
-	tiles := make([]tile, len(segs))
-	for idx, seg := range segs {
-		rs := r.FindAllStringSubmatch(seg, -1)
-		if len(rs) > 0 {
-			tiles[idx].Token, _ = strconv.Atoi(rs[0][1])
-			if len(rs[0]) > 1 {
-				tiles[idx].Terrain = convertTerrainToCardType(rs[0][2])
-			}
-		}
+		tiles[idx] = [2]int{rt, token}
 	}
 	return tiles
 }
 
-func CatNodes(ID int) string {
-	b := NewBoard(ID)
-	var output []string
-	for i := 0; i < len(b._map.nodes); i++ {
-		output = append(output, b._map.nodes[i].String())
+func (board Board) JSON() string {
+	tiles := board.GetTiles()
+	makeIntersections := func(l []*intersection) string {
+		var nodes []string
+		for _, h := range l {
+			nodes = append(nodes, fmt.Sprintf("{index:%d,x:%f,y:%f, hasPort:%t, portResource:'%s'}", h.index, h.x, h.y, h.hasPort, h.portResource))
+		}
+		return "[" + strings.Join(nodes, ",") + "]"
 	}
-	return strings.Join(output, "\n")
-}
-
-func CatIntersections(ID int) string {
-	b := NewBoard(ID)
-	var output []string
-	for i := 0; i < len(b._map.coordinators); i++ {
-		nc := b._map.coordinators[i]
-		output = append(output, fmt.Sprint(nc.index, nc, nc.neighbors))
+	var nodes []string
+	for _, h := range board.g.grid {
+		if h.resource == "-" || h.resource == "s" {
+			continue
+		}
+		nodes = append(nodes, fmt.Sprintf("{index:%d,x:%f,y:%f,intersections:%s,port:%t,port_direction:%f,resoure:'%s',token:%d}", h.index, h.x, h.y, makeIntersections(h.intersections), h.port, h.direction, h.resource, tiles[h.index][1]))
 	}
-	return strings.Join(output, "\n")
+	return "[" + strings.Join(nodes, ",") + "]"
 }
 
 func NewBoard(ID int) Board {
-	_map := newMap()
+	var g = new(grid)
 	if ID == 0 {
-		_map.build(maps.DefaultMap{})
-	}
-	if ID == 1 {
-		_map.build(maps.Diamond{})
+		g.Build(maps.DefaultMap{}.GetTileConfig())
 	}
 	board := new(Board)
-	board._map = _map
+	board.g = g
+	fmt.Println(board.JSON())
 	return *board
 }
