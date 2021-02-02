@@ -50,6 +50,14 @@ func (player Player) String() string {
 	return fmt.Sprintf("Player %d", player.ID)
 }
 
+func (player Player) hasMoreCardsThen(limit int) (bool, int) {
+	cardCount := 0
+	for _, card := range player.Cards {
+		cardCount += card
+	}
+	return cardCount > limit, cardCount
+}
+
 func NewPlayer() *Player {
 	p := new(Player)
 	return p

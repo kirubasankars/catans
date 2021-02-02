@@ -640,13 +640,12 @@ func (context *gameContext) isActionTimeout() bool {
 func (context *gameContext) handleDice(dice int) error {
 	if dice == 7 {
 		for _, player := range context.Players {
-			if len(player.Cards) > context.DiscardCardLimit {
+			if yes, _ := player.hasMoreCardsThen(context.DiscardCardLimit); yes {
 				context.scheduleAction(ActionDiscardCards)
-				break
-			} else {
-				context.scheduleAction(ActionPlaceRobber)
+				return nil
 			}
 		}
+		context.scheduleAction(ActionPlaceRobber)
 		return nil
 	}
 
@@ -756,12 +755,32 @@ func (context gameContext) calculateLongestRoad(player Player, otherPlayersSettl
 
 func (context *gameContext) randomDiscardCards() {
 	for _, player := range context.Players {
-		cardCount := 0
-		for _, card := range player.Cards {
-			cardCount += card
-		}
-		if cardCount > 7 {
-			fmt.Println(fmt.Sprintf("Player %d looses %d cards.", player.ID, len(player.Cards)/2))
+		if yes, cardCount := player.hasMoreCardsThen(context.DiscardCardLimit); yes {
+			numberOfCardsRemove := cardCount / 2
+
+			for {
+				cardId := rand.Intn(5)
+				card := player.Cards[cardId]
+				if card == 0 {
+					if numberOfCardsRemove <= 0 {
+						break
+					}
+					continue
+				}
+
+				r := rand.Intn(card) + 1
+				if numberOfCardsRemove - r >= 0 {
+					player.Cards[cardId] = card - r
+					numberOfCardsRemove -= r
+				} else {
+					player.Cards[cardId] = card - numberOfCardsRemove
+					numberOfCardsRemove = 0
+				}
+
+				if numberOfCardsRemove <= 0 {
+					break
+				}
+			}
 		}
 	}
 }
