@@ -12,6 +12,11 @@ type tile struct {
 }
 
 func convertTerrainToCardType(terrain string) int {
+	// 0 - lumber
+	// 1 - brick
+	// 2 - wool
+	// 3 - grain
+	// 4 - ore
 	switch terrain {
 	case "FO":
 		return 0

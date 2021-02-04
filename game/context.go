@@ -1,5 +1,11 @@
 package game
 
+// 0 - lumber
+// 1 - brick
+// 2 - wool
+// 3 - grain
+// 4 - ore
+
 import (
 	"catans/board"
 	"catans/utils"
@@ -36,7 +42,7 @@ type gameContext struct {
 }
 
 func (context gameContext) getCurrentPlayer() *Player {
-	return context.Players[context.CurrentPlayer]
+	return context.Players[context.CurrentPlayerID]
 }
 
 func (context gameContext) getGamePhase() string {
@@ -50,26 +56,106 @@ func (context *gameContext) putSettlement(validate bool, intersection int) error
 			return errors.New(utils.ErrInvalidOperation)
 		}
 	}
-
-	var settlement Settlement
+	currentPlayer := context.getCurrentPlayer()
 
 	if Phase2 == context.Phase || Phase3 == context.Phase {
 		if context.getActionString() != ActionPlaceSettlement {
 			return errors.New(utils.ErrInvalidOperation)
 		}
-		tileIndices := context.board.GetTileIndices(intersection)
-		tokens := make([]int, len(tileIndices))
-		for i, idx := range tileIndices {
-			tokens[i] = context.tiles[idx][1]
-		}
-		settlement = Settlement{Indices: tileIndices, Tokens: tokens, Intersection: intersection}
+	}
 
-		currentPlayer := context.getCurrentPlayer()
-		currentPlayer.Settlements = append(currentPlayer.Settlements, settlement)
+	if Phase4 == context.Phase {
+		cards := [][2]int{{0, 1}, {1, 1}, {2, 1}, {3, 1}}
+		if !context.isPlayerHasAllCards(currentPlayer.ID, cards) {
+			return errors.New(utils.ErrInvalidOperation)
+		}
+
+		context.Bank.Begin()
+		for _, card := range cards {
+			currentPlayer.Cards[card[0]] -= card[1]
+			context.Bank.Return(card[0], card[1])
+		}
+		context.Bank.Commit()
+	}
+
+	var settlement Settlement
+	tileIndices := context.board.GetTileIndices(intersection)
+	tokens := make([]int, len(tileIndices))
+	for i, idx := range tileIndices {
+		tokens[i] = context.tiles[idx][1]
+	}
+	settlement = Settlement{Indices: tileIndices, Tokens: tokens, Intersection: intersection}
+	currentPlayer.Settlements = append(currentPlayer.Settlements, settlement)
+
+	if Phase2 == context.Phase || Phase3 == context.Phase {
 		return context.endAction()
 	}
 
 	return nil
+}
+
+func(context *gameContext) upgradeSettlement(intersection int) error {
+	currentPlayer := context.getCurrentPlayer()
+	if Phase4 == context.Phase {
+		var settlement *Settlement
+		for _, s := range currentPlayer.Settlements {
+			if s.Intersection == intersection {
+				settlement = &s
+				break
+			}
+		}
+		if settlement == nil {
+			return errors.New(utils.ErrInvalidOperation)
+		}
+
+		cards := [][2]int{{3, 2}, {4, 3}}
+		if !context.isPlayerHasAllCards(currentPlayer.ID, cards) {
+			return errors.New(utils.ErrInvalidOperation)
+		}
+
+		settlement.Upgraded = true
+		context.Bank.Begin()
+		for _, card := range cards {
+			currentPlayer.Cards[card[0]] -= card[1]
+			err := context.Bank.Return(card[0], card[1])
+			if err != nil {
+				return err
+			}
+		}
+		context.Bank.Commit()
+
+		return nil
+	}
+	return errors.New(utils.ErrInvalidOperation)
+}
+
+func (context *gameContext) buyDevelopmentCard() error {
+	currentPlayer := context.getCurrentPlayer()
+	if Phase4 == context.Phase {
+		cards := [][2]int{{2, 1}, {3, 1}, {4, 1}}
+		if !context.isPlayerHasAllCards(currentPlayer.ID, cards) {
+			return errors.New(utils.ErrInvalidOperation)
+		}
+
+		context.Bank.Begin()
+
+		for _, card := range cards {
+			currentPlayer.Cards[card[0]] -= card[1]
+			err := context.Bank.Return(card[0], card[1])
+			if err != nil {
+				return err
+			}
+		}
+		card, err := context.Bank.BuyDevCard()
+		if err != nil {
+			return err
+		}
+
+		currentPlayer.DevCards = append(currentPlayer.DevCards, card)
+
+		context.Bank.Commit()
+	}
+	return errors.New(utils.ErrInvalidOperation)
 }
 
 func (context *gameContext) getPossibleRoads() ([][2]int, error) {
@@ -247,6 +333,22 @@ func (context *gameContext) putRoad(validate bool, road [2]int) error {
 		}
 	}
 
+	if Phase4 == context.Phase {
+		currentPlayer := context.getCurrentPlayer()
+		cards := [][2]int{{0, 1}, {1, 1}}
+		if !context.isPlayerHasAllCards(currentPlayer.ID, cards) {
+			return errors.New(utils.ErrInvalidOperation)
+		}
+		context.Bank.Begin()
+		for _, card := range cards {
+			currentPlayer.Cards[card[0]] -= card[1]
+			context.Bank.Give(card[0], card[1])
+		}
+		context.Bank.Commit()
+		currentPlayer.Roads = append(currentPlayer.Roads, road)
+		return nil
+	}
+
 	if Phase2 == context.Phase || Phase3 == context.Phase {
 		if context.getActionString() != ActionPlaceRoad {
 			return errors.New(utils.ErrInvalidOperation)
@@ -298,7 +400,7 @@ func (context *gameContext) scheduleAction(action string) {
 }
 
 func (context *gameContext) bankTrade(gives, wants [][2]int) error {
-	if len(gives) == 1 && len(wants) == 1 && wants[0][1] == 1 && gives[0][1] > 1 {
+	if context.Phase == Phase4 && len(gives) == 1 && len(wants) == 1 && wants[0][1] == 1 && gives[0][1] > 1 {
 		currentPlayer := context.getCurrentPlayer()
 		if !context.isSafeTrade(gives, wants) || !context.isPlayerHasAllCards(currentPlayer.ID, gives) {
 			return errors.New(utils.ErrInvalidOperation)
@@ -412,7 +514,7 @@ func (context *gameContext) overrideTrade(playerID, tradeID int, gives [][2]int,
 		hasAllCards = true
 	}
 	trade.From = trade.To
-	trade.To = context.CurrentPlayer
+	trade.To = context.CurrentPlayerID
 	trade.Gives = gives
 	trade.Wants = wants
 	trade.HasAllCards = hasAllCards
@@ -492,7 +594,7 @@ func (context *gameContext) startPhase2() error {
 		return errors.New(utils.ErrInvalidOperation)
 	}
 	context.Phase = Phase2
-	context.CurrentPlayer = 0
+	context.CurrentPlayerID = 0
 	context.scheduleAction(ActionPlaceSettlement)
 	return nil
 }
@@ -504,7 +606,7 @@ func (context *gameContext) startPhase3() {
 
 func (context *gameContext) startPhase4() {
 	context.Phase = Phase4
-	context.CurrentPlayer = 0
+	context.CurrentPlayerID = 0
 	context.scheduleAction(ActionRollDice)
 }
 
@@ -540,7 +642,7 @@ func (context *gameContext) phase3GetNextAction() string {
 }
 
 func (context *gameContext) endAction() error {
-	fmt.Println("END", context.getActionString(), context.CurrentPlayer)
+	fmt.Println("END", context.getActionString(), context.CurrentPlayerID)
 
 	NumberOfPlayers := context.GameSetting.NumberOfPlayers - 1
 
@@ -566,10 +668,10 @@ func (context *gameContext) endAction() error {
 		}
 
 		if lastAction == ActionTurn {
-			if context.CurrentPlayer < NumberOfPlayers {
-				context.CurrentPlayer++
+			if context.CurrentPlayerID < NumberOfPlayers {
+				context.CurrentPlayerID++
 			} else {
-				context.CurrentPlayer = 0
+				context.CurrentPlayerID = 0
 			}
 			context.scheduleAction(ActionRollDice)
 		}
@@ -578,11 +680,11 @@ func (context *gameContext) endAction() error {
 
 	if Phase2 == context.Phase {
 		nextAction := context.phase2GetNextAction()
-		if nextAction == "" && context.CurrentPlayer < NumberOfPlayers {
-			context.CurrentPlayer++
+		if nextAction == "" && context.CurrentPlayerID < NumberOfPlayers {
+			context.CurrentPlayerID++
 			nextAction = context.phase2GetNextAction()
 		}
-		if nextAction == "" && context.CurrentPlayer == NumberOfPlayers {
+		if nextAction == "" && context.CurrentPlayerID == NumberOfPlayers {
 			context.startPhase3()
 		} else {
 			context.scheduleAction(nextAction)
@@ -591,11 +693,11 @@ func (context *gameContext) endAction() error {
 
 	if Phase3 == context.Phase {
 		nextAction := context.phase3GetNextAction()
-		if nextAction == "" && context.CurrentPlayer > 0 {
-			context.CurrentPlayer--
+		if nextAction == "" && context.CurrentPlayerID > 0 {
+			context.CurrentPlayerID--
 			nextAction = context.phase3GetNextAction()
 		}
-		if nextAction == "" && context.CurrentPlayer == 0 {
+		if nextAction == "" && context.CurrentPlayerID == 0 {
 			context.startPhase4()
 		} else {
 			context.scheduleAction(nextAction)
@@ -660,8 +762,18 @@ func (context *gameContext) handleDice(dice int) error {
 		for _, settlement := range player.Settlements {
 			for idx, token := range settlement.Tokens {
 				if token == dice {
+					tileIndex := settlement.Indices[idx]
+					if tileIndex == context.RobberPlacement {
+						continue
+					}
 					terrain := context.tiles[settlement.Indices[idx]][0]
-					count, err := context.Bank.Give(terrain, 1)
+					var count = 0
+					var err error = nil
+					if settlement.Upgraded {
+						count, err = context.Bank.Give(terrain, 2)
+					} else {
+						count, err = context.Bank.Give(terrain, 1)
+					}
 					if err != nil {
 						bank.Rollback()
 						return err
@@ -769,7 +881,7 @@ func (context *gameContext) randomDiscardCards() {
 				}
 
 				r := rand.Intn(card) + 1
-				if numberOfCardsRemove - r >= 0 {
+				if numberOfCardsRemove-r >= 0 {
 					player.Cards[cardId] = card - r
 					numberOfCardsRemove -= r
 				} else {
@@ -783,6 +895,57 @@ func (context *gameContext) randomDiscardCards() {
 			}
 		}
 	}
+}
+
+func (context *gameContext) randomPlaceRobber() {
+	var occupiedIns []int
+	for _, player := range context.Players {
+		if player.ID == context.CurrentPlayerID {
+			continue
+		}
+		for _, settlement := range player.Settlements {
+			occupiedIns = append(occupiedIns, settlement.Intersection)
+		}
+	}
+	ins := rand.Intn(len(occupiedIns))
+	tileIndices := context.board.GetTileIndices(ins)
+	context.RobberPlacement = tileIndices[0]
+	context.scheduleAction(ActionSelectToRob)
+}
+
+func (context *gameContext) randomSelectPlayerToRob() {
+	var playerToRob int = -1
+	for _, player := range context.Players {
+		if player.ID == context.CurrentPlayerID {
+			continue
+		}
+		for _, settlement := range player.Settlements {
+			if settlement.Intersection == context.RobberPlacement {
+				playerToRob = player.ID
+			}
+		}
+	}
+
+	if playerToRob > -1 {
+		context.robAPlayer(playerToRob)
+	}
+}
+
+func (context *gameContext) robAPlayer(playerID int) {
+	currentPlayer := context.getCurrentPlayer()
+	otherPlayer := context.Players[playerID]
+	var availableCards []int
+	for idx, card := range otherPlayer.Cards {
+		if card == 0 {
+			continue
+		}
+		availableCards = append(availableCards, idx)
+	}
+	r := rand.Intn(len(availableCards))
+	randCardType := availableCards[r]
+
+	otherPlayer.Cards[randCardType] -= 1
+	currentPlayer.Cards[randCardType] += 1
 }
 
 func NewGameContext() *gameContext {

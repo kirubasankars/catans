@@ -82,7 +82,7 @@ func (game Game) CompleteTrade(tradeID int) error {
 }
 
 func (game Game) CurrentPlayer() int {
-	return game.context.CurrentPlayer
+	return game.context.CurrentPlayerID
 }
 
 func (game Game) GetPossibleSettlementLocations() ([]int, error) {
@@ -99,6 +99,14 @@ func (game Game) PutRoad(road [2]int) error {
 
 func (game Game) PutSettlement(intersection int) error {
 	return game.context.putSettlement(true, intersection)
+}
+
+func (game Game) UpgradeSettlement(intersection int) error {
+	return game.context.upgradeSettlement(intersection)
+}
+
+func (game Game) BuyDevelopmentCard() error {
+	return game.context.buyDevelopmentCard()
 }
 
 func (game *Game) run() {
@@ -133,6 +141,14 @@ func (game *Game) run() {
 	case ActionRollDice:
 		{
 			game.RollDice()
+		}
+	case ActionPlaceRobber:
+		{
+			context.randomPlaceRobber()
+		}
+	case ActionSelectToRob:
+		{
+			context.randomSelectPlayerToRob()
 		}
 	}
 }
