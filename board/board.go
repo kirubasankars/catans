@@ -1,7 +1,7 @@
 package board
 
 import (
-	"catans/maps"
+	"catans/board/maps"
 	"catans/utils"
 	"fmt"
 	"strings"

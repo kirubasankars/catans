@@ -1,6 +1,6 @@
 package game
 
-type GameSetting struct {
+type Setting struct {
 	TurnTimeOut     bool
 	NumberOfPlayers int
 	Speed           int

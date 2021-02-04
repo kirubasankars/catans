@@ -12,7 +12,7 @@ type Game struct {
 	tickerDone chan bool
 }
 
-func (game *Game) UpdateGameSetting(gs GameSetting) error {
+func (game *Game) UpdateGameSetting(gs Setting) error {
 	return game.context.updateGameSetting(gs)
 }
 
@@ -110,7 +110,7 @@ func (game Game) BuyDevelopmentCard() error {
 }
 
 func (game *Game) run() {
-	//time out, run the next action
+	//time out, run the next Action
 
 	context := game.context
 	if context == nil || context.getAction() == nil || !context.isActionTimeout() {
@@ -124,11 +124,11 @@ func (game *Game) run() {
 		switch playerAction.Name {
 		case ActionPlaceSettlement:
 			{
-				context.randomPlaceInitialSettlement()
+				_ = context.randomPlaceInitialSettlement()
 			}
 		case ActionPlaceRoad:
 			{
-				context.randomPlaceInitialRoad()
+				_ = context.randomPlaceInitialRoad()
 			}
 		}
 	}
@@ -140,15 +140,15 @@ func (game *Game) run() {
 		}
 	case ActionRollDice:
 		{
-			game.RollDice()
+			_ = game.RollDice()
 		}
 	case ActionPlaceRobber:
 		{
 			context.randomPlaceRobber()
 		}
-	case ActionSelectToRob:
+	case ActionSelectToSteal:
 		{
-			context.randomSelectPlayerToRob()
+			context.randomSelectPlayerToSteal()
 		}
 	}
 }

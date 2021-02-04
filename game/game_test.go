@@ -8,7 +8,7 @@ import (
 func TestGame1(t *testing.T) {
 
 	game := NewGame()
-	gs := *new(GameSetting)
+	gs := *new(Setting)
 	gs.Map = 0
 	gs.NumberOfPlayers = 2
 	gs.TurnTimeOut = false
@@ -107,7 +107,7 @@ func TestGame1(t *testing.T) {
 func TestGame2(t *testing.T) {
 
 	game := NewGame()
-	gs := *new(GameSetting)
+	gs := *new(Setting)
 	gs.Map = 0
 	gs.NumberOfPlayers = 2
 	game.UpdateGameSetting(gs)
@@ -132,11 +132,10 @@ func TestGame2(t *testing.T) {
 	fmt.Println("")
 }
 
-
 func TestGameDiscardCards(t *testing.T) {
 
 	game := NewGame()
-	gs := *new(GameSetting)
+	gs := *new(Setting)
 	gs.Map = 0
 	gs.NumberOfPlayers = 3
 	gs.DiscardCardLimit = 7
@@ -145,11 +144,10 @@ func TestGameDiscardCards(t *testing.T) {
 	counterFn := func(cards [5]int) int {
 		count := 0
 		for _, card := range cards {
-			count+=card
+			count += card
 		}
 		return count
 	}
-
 
 	game.context.Players[0].Cards = [5]int{3, 3, 4, 5, 6}
 	game.context.Players[1].Cards = [5]int{3, 3, 4, 5, 7}

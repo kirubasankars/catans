@@ -30,8 +30,8 @@ type intersection struct {
 	hasPort      bool
 	portResource string
 
-	nodes        []*hexagon
-	neighbors    []*intersection
+	nodes     []*hexagon
+	neighbors []*intersection
 }
 
 type grid struct {

@@ -21,7 +21,7 @@ type Player struct {
 func (player Player) stat() {
 	var lines []string
 	for idx, count := range player.Cards {
-		name := convertCardTypeToName(idx)
+		name := convertCardTypeToTerrain(idx)
 		lines = append(lines, fmt.Sprintf("%s:%d", name, count))
 	}
 	fmt.Println(player.ID, strings.Join(lines, ", "))

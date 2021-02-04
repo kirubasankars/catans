@@ -7,8 +7,8 @@ import (
 )
 
 type Bank struct {
-	cards        [5]int
-	devCards     []int
+	cards    [5]int
+	devCards []int
 
 	devCardIndex int
 	t            *Bank
@@ -45,7 +45,7 @@ func (bank *Bank) Give(cardType int, count int) (int, error) {
 	return count, nil
 }
 
-func (bank *Bank) Return(cardType int, count int) error {
+func (bank *Bank) Take(cardType int, count int) error {
 	if bank.cards[cardType] > 19 {
 		return errors.New(utils.ErrInvalidOperation)
 	}
@@ -64,7 +64,7 @@ func (bank *Bank) BuyDevCard() (int, error) {
 func NewBank() *Bank {
 	bank := new(Bank)
 	bank.cards = [5]int{19, 19, 19, 19, 19}
-	bank.devCards = []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 3, 3, 4, 4}
+	bank.devCards = []int{DevCardKnight, DevCardKnight, DevCardKnight, DevCardKnight, DevCardKnight, DevCardKnight, DevCardKnight, DevCardKnight, DevCardKnight, DevCardKnight, DevCardKnight, DevCardKnight, DevCardKnight, DevCardKnight, DevCardVPPoint, DevCardVPPoint, DevCardVPPoint, DevCardVPPoint, DevCardVPPoint, DevCardMonopoly, DevCardMonopoly, DevCard2Road, DevCard2Road, DevCard2Resource, DevCard2Resource}
 	bank.devCardIndex = len(bank.devCards)
 	for i := len(bank.devCards) - 1; i > 0; i-- {
 		j := rand.Intn(i + 1)

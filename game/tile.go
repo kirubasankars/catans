@@ -32,7 +32,7 @@ func convertTerrainToCardType(terrain string) int {
 	return -1
 }
 
-func convertCardTypeToName(cardType int) string {
+func convertCardTypeToTerrain(cardType int) string {
 	switch cardType {
 	case 0:
 		return "Log"

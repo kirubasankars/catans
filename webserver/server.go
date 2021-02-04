@@ -11,7 +11,7 @@ func StartWebServer() {
 	lobby := game.NewLobby()
 
 	http.HandleFunc("/create_game", func(w http.ResponseWriter, r *http.Request) {
-		gs := game.GameSetting{NumberOfPlayers: 2}
+		gs := game.Setting{NumberOfPlayers: 2}
 		gameID, _ := lobby.CreateGame(gs)
 		w.Write([]byte(gameID))
 	})

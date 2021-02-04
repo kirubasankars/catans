@@ -6,6 +6,6 @@ import (
 
 func main() {
 	lobby := game.NewLobby()
-	lobby.CreateGame(game.GameSetting{NumberOfPlayers: 2})
+	lobby.CreateGame(game.Setting{NumberOfPlayers: 2})
 	//webserver.StartWebServer()
 }

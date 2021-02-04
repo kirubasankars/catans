@@ -1,12 +1,12 @@
 package game
 
-type GameState struct {
+type State struct {
 	Phase           string
 	Action          gameAction
 	Bank            *Bank
 	CurrentPlayerID int
 	Players         []*Player
-
+	Tiles           [][2]int
 	RobberPlacement int
 }
 
@@ -14,7 +14,7 @@ type Settlement struct {
 	Tokens       []int
 	Indices      []int
 	Intersection int
-	Upgraded	 bool
+	Upgraded     bool
 }
 
 type Road struct {
