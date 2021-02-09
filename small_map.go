@@ -1,9 +1,9 @@
 package main
 
-type DefaultMap struct {
+type SmallMap struct {
 }
 
-func (defaultMap DefaultMap) GetTileConfig() string {
+func (smallMap SmallMap) GetTileConfig() string {
 	return `
 -,s,s?5,s,so4,-
 s?0,t,p,m,s,-
@@ -13,6 +13,6 @@ sl0,h,p,f,s,-
 	`
 }
 
-func (defaultMap DefaultMap) GetChits() []int {
+func (smallMap SmallMap) GetChits() []int {
 	return []int{10, 2, 9, 12, 6, 4, 10, 9, 11, 3, 8, 8, 3, 4, 5, 5, 6, 11}
 }
