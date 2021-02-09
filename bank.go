@@ -6,6 +6,17 @@ import (
 )
 
 type Bank struct {
+	// 0 - lumber
+	// 1 - brick
+	// 2 - wool
+	// 3 - grain
+	// 4 - ore
+
+	// 0 - tree
+	// 1 - hill
+	// 2 - pasture
+	// 3 - field
+	// 4 - mountain
 	cards    [5]int
 	devCards []int
 
@@ -14,9 +25,8 @@ type Bank struct {
 }
 
 func (bank *Bank) Begin() {
-	bank.t = NewBank()
+	bank.t = &Bank{}
 	bank.t.cards = bank.cards
-	bank.t.devCards = bank.devCards
 }
 
 func (bank *Bank) Commit() {
@@ -25,7 +35,6 @@ func (bank *Bank) Commit() {
 
 func (bank *Bank) Rollback() {
 	bank.cards = bank.t.cards
-	bank.devCards = bank.t.devCards
 	bank.t = nil
 }
 
@@ -45,7 +54,7 @@ func (bank *Bank) Give(cardType int, count int) (int, error) {
 }
 
 func (bank *Bank) Take(cardType int, count int) error {
-	if bank.cards[cardType] > 19 {
+	if bank.cards[cardType] + count > 19 {
 		return errors.New(ErrInvalidOperation)
 	}
 	bank.cards[cardType] = bank.cards[cardType] + count

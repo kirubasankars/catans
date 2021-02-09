@@ -91,28 +91,32 @@ func (board Board) GetTiles() [][2]int {
 }
 
 func (board Board) JSON() string {
-	tiles := board.GetTiles()
-	makeIntersections := func(l []*Intersection) string {
-		var nodes []string
-		for _, h := range l {
-			nodes = append(nodes, fmt.Sprintf("{index:%d,x:%f,y:%f, hasPort:%t, portResource:'%s'}", h.index, h.x, h.y, h.hasPort, h.portResource))
-		}
-		return "[" + strings.Join(nodes, ",") + "]"
-	}
+	//tiles := board.GetTiles()
+	//makeIntersections := func(l []*Intersection) string {
+	//	var nodes []string
+	//	for _, h := range l {
+	//		nodes = append(nodes, fmt.Sprintf("{index:%d,x:%f,y:%f, hasPort:%t, portResource:'%s'}", h.index, h.x, h.y, h.hasPort, h.portResource))
+	//	}
+	//	return "[" + strings.Join(nodes, ",") + "]"
+	//}
 	var nodes []string
 	for _, h := range board.grid.nodes {
 		if h.resource == "-" || h.resource == "s" {
 			continue
 		}
-		nodes = append(nodes, fmt.Sprintf("{index:%d,x:%f,y:%f,intersections:%s,port:%t,port_direction:%f,resoure:'%s',token:%d}", h.index, h.x, h.y, makeIntersections(h.intersections), h.port, h.portDirection, h.resource, tiles[h.index][1]))
+		nodes = append(nodes, fmt.Sprintf("{index:%d,x:%f,y:%f,r:%f}", h.index, h.x, h.y,h.r))
 	}
-	return "[" + strings.Join(nodes, ",") + "]"
+	return "{'nodes': [" + strings.Join(nodes, ",") + "]}"
 }
 
 func NewBoard(ID int) Board {
 	var grid = new(Grid)
 	if ID == 0 {
 		m := DefaultMap{}
+		grid.Build(m)
+	}
+	if ID == 1 {
+		m := SmallMap{}
 		grid.Build(m)
 	}
 	board := new(Board)

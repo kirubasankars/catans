@@ -68,3 +68,12 @@ func TestThreeTileGrid(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestSmallMap(t *testing.T) {
+	grid := Grid{}
+	grid.Build(SmallMap{})
+
+	if len(grid.intersections) != 32 {
+		t.Fail()
+	}
+}

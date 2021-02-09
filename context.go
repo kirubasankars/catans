@@ -629,6 +629,7 @@ func (context *GameContext) startPhase4() error {
 		return errors.New(ErrInvalidOperation)
 	}
 	context.phase = Phase4
+	context.giveInitialFreeCards()
 	context.CurrentPlayerID = 0
 	context.scheduleAction(ActionRollDice)
 	return nil
@@ -1045,6 +1046,24 @@ func (context *GameContext) play2Road(roads [][2]int) error {
 	for _, road := range roads {
 		currentPlayer.Roads = append(currentPlayer.Roads, road)
 	}
+	return nil
+}
+
+func (context *GameContext) giveInitialFreeCards() error {
+	context.Bank.Begin()
+	for _, player := range context.Players {
+		r := rand.Intn(2)
+		indices := player.Settlements[r].Indices
+		cardType := context.Tiles[indices[0]][0]
+		context.Bank.Give(cardType, 1)
+		player.Cards[cardType]++
+		if len(indices) > 1 {
+			cardType := context.Tiles[indices[1]][0]
+			context.Bank.Give(cardType, 1)
+			player.Cards[cardType]++
+		}
+	}
+	context.Bank.Commit()
 	return nil
 }
 

@@ -16,8 +16,3 @@ type Settlement struct {
 	Intersection int
 	Upgraded     bool
 }
-
-type Road struct {
-	Points [2]int
-	player *Player
-}
