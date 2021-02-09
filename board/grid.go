@@ -230,7 +230,6 @@ func (grid *Grid) parseTiles(m string) ([]string, int, int) {
 	return tiles, h, w
 }
 
-
 func (grid *Grid) Build(config MapConfig) {
 	grid.r = 50
 	tilesConfig, height, width := grid.parseTiles(config.GetTileConfig())

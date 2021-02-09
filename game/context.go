@@ -6,6 +6,12 @@ package game
 // 3 - grain
 // 4 - ore
 
+// 0 - tree
+// 1 - hill
+// 2 - pasture
+// 3 - field
+// 4 - mountain
+
 import (
 	"catans/board"
 	"catans/utils"
@@ -35,7 +41,6 @@ type gameContext struct {
 	board        board.Board
 	tradeCounter int
 	trades       []*gameTrade
-
 
 	Setting
 	State
@@ -980,7 +985,7 @@ func (context *gameContext) playMonopoly(cardType int) error {
 	for idx, devCard := range currentPlayer.DevCards {
 		if devCard == DevCardMonopoly {
 			hasMonopoly = true
-			utils.Remove(currentPlayer.DevCards, idx)
+			currentPlayer.DevCards = utils.Remove(currentPlayer.DevCards, idx)
 			break
 		}
 	}
