@@ -8,7 +8,7 @@ import (
 func TestGame1(t *testing.T) {
 
 	game := NewGame()
-	gs := *new(Setting)
+	gs := *new(GameSetting)
 	gs.Map = 0
 	gs.NumberOfPlayers = 2
 	gs.TurnTimeOut = false
@@ -114,7 +114,7 @@ func TestGame1(t *testing.T) {
 
 func TestGameDiscardCards(t *testing.T) {
 	game := NewGame()
-	gs := *new(Setting)
+	gs := *new(GameSetting)
 	gs.Map = 0
 	gs.NumberOfPlayers = 3
 	gs.DiscardCardLimit = 7
@@ -160,11 +160,8 @@ func TestGameDiscardCards(t *testing.T) {
 
 func TestPlayMonopoly(t *testing.T) {
 	game := NewGame()
-	gs := *new(Setting)
-	gs.Map = 0
-	gs.NumberOfPlayers = 4
-	gs.DiscardCardLimit = 7
-	game.UpdateGameSetting(gs)
+	game.UpdateGameSetting(GameSetting{NumberOfPlayers: 4, Map: 0})
+	game.context.phase = Phase4
 
 	game.context.Players[0].DevCards = append(game.context.Players[0].DevCards, DevCardMonopoly)
 	game.context.Players[1].DevCards = append(game.context.Players[1].DevCards, DevCardMonopoly)

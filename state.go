@@ -1,8 +1,8 @@
 package main
 
-type State struct {
-	Phase           string
-	Action          gameAction
+type GameState struct {
+	phase           string
+	Action          GameAction
 	Bank            *Bank
 	CurrentPlayerID int
 	Players         []*Player

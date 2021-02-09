@@ -2,6 +2,6 @@ package main
 
 func main() {
 	lobby := NewLobby()
-	lobby.CreateGame(Setting{NumberOfPlayers: 2})
-	//webserver.StartWebServer()
+	lobby.CreateGame(GameSetting{NumberOfPlayers: 2})
+	StartWebServer()
 }

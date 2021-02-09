@@ -7,7 +7,7 @@ type GameEngine struct {
 	gameCounter int
 }
 
-func (ge *GameEngine) CreateGame(gs Setting) (string, error) {
+func (ge *GameEngine) CreateGame(gs GameSetting) (string, error) {
 	game := NewGame()
 	id := fmt.Sprintf("GAME#%d", ge.gameCounter)
 	ge.games[id] = *game
