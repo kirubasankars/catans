@@ -99,16 +99,9 @@ func (g *grid) makeIntersections() {
 			var ins *intersection
 			var nodes []*hexagon
 			var k []string
-			var port *hexagon
 
 			for _, h1 := range g.grid {
-				if h.resource == "-" || h.resource == "s" {
-					continue
-				}
 				if g.circlesIntersect(x, y, ir, h1.x, h1.y, h1.r) {
-					if h1.port {
-						port = h1
-					}
 					nodes = append(nodes, h1)
 					k = append(k, strconv.Itoa(h1.index))
 				}
@@ -130,30 +123,6 @@ func (g *grid) makeIntersections() {
 			ins.nodes = nodes
 			neighbors = append(neighbors, nodes...)
 			h.intersections = append(h.intersections, ins)
-
-			if port != nil {
-				ins.hasPort = true
-				ins.portResource = port.resource
-				getNextSide := func(s float64) float64 {
-					if s == 5.0 {
-						return 0.0
-					}
-					return s + 1
-				}
-
-				px := port.x + r*math.Cos((a*port.direction)+11)
-				py := port.y + r*math.Sin((a*port.direction)+11)
-				if g.circlesIntersect(ins.x, ins.y, ins.r, px, py, 0) {
-					port.intersections = append(port.intersections, ins)
-				}
-
-				nd := getNextSide(port.direction)
-				px = port.x + r*math.Cos((a*nd)+11)
-				py = port.y + r*math.Sin((a*nd)+11)
-				if g.circlesIntersect(ins.x, ins.y, ins.r, px, py, 0) {
-					port.intersections = append(port.intersections, ins)
-				}
-			}
 		}
 
 		var neighborMap = make(map[int]bool)
@@ -164,6 +133,42 @@ func (g *grid) makeIntersections() {
 			if _, ok := neighborMap[n.index]; !ok {
 				h.neighbors = append(h.neighbors, n)
 				neighborMap[n.index] = true
+			}
+		}
+	}
+
+	getNextSide := func(s float64) float64 {
+		if s == 5.0 {
+			return 0.0
+		}
+		return s + 1
+	}
+
+	for _, h := range g.grid {
+		if !h.port {
+			continue
+		}
+		var portIntersections []*intersection
+		for _, ins := range intersections {
+			if g.circlesIntersect(h.x, h.y, h.r, ins.x, ins.y, ins.r) {
+				portIntersections = append(portIntersections, ins)
+			}
+		}
+
+		for _, ins := range portIntersections {
+			var px = h.x + r * math.Cos((a * h.direction) + 11)
+			var py = h.y + r * math.Sin((a * h.direction) + 11)
+			if g.circlesIntersect(ins.x, ins.y, ins.r, px, py, ins.r) {
+				ins.hasPort = true
+				ins.portResource = h.resource
+			}
+
+			var ns = getNextSide(h.direction)
+			px = h.x + r * math.Cos((a * ns) + 11)
+			py = h.y + r * math.Sin((a * ns) + 11)
+			if g.circlesIntersect(ins.x, ins.y, ins.r, px, py, ins.r) {
+				ins.hasPort = true
+				ins.portResource = h.resource
 			}
 		}
 	}

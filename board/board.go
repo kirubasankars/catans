@@ -73,13 +73,13 @@ func (board Board) GetTiles() [][2]int {
 		switch n.resource {
 		case "t":
 			rt = 0
-		case "m":
-			rt = 1
-		case "f":
-			rt = 2
-		case "p":
-			rt = 3
 		case "h":
+			rt = 1
+		case "p":
+			rt = 2
+		case "f":
+			rt = 3
+		case "m":
 			rt = 4
 		default:
 			rt = -1

@@ -317,6 +317,21 @@ func (context *gameContext) getPossibleSettlementLocations() ([]int, error) {
 	return nil, errors.New(utils.ErrInvalidOperation)
 }
 
+func (context *gameContext) validateRoadPlacement(road [2]int) error {
+	availableRoads, _ := context.getPossibleRoads()
+	matched := false
+	for _, availableRoad := range availableRoads {
+		if availableRoad == road {
+			matched = true
+			break
+		}
+	}
+	if !matched {
+		return errors.New(utils.ErrInvalidOperation)
+	}
+	return nil
+}
+
 func (context *gameContext) putRoad(validate bool, road [2]int) error {
 	if road[0] > road[1] {
 		s := road[1]
@@ -324,16 +339,8 @@ func (context *gameContext) putRoad(validate bool, road [2]int) error {
 		road[0] = s
 	}
 	if validate {
-		availableRoads, _ := context.getPossibleRoads()
-		matched := false
-		for _, availableRoad := range availableRoads {
-			if availableRoad == road {
-				matched = true
-				break
-			}
-		}
-		if !matched {
-			return errors.New(utils.ErrInvalidOperation)
+		if err := context.validateRoadPlacement(road); err != nil {
+			return err
 		}
 	}
 
@@ -990,6 +997,43 @@ func (context *gameContext) playMonopoly(cardType int) error {
 		otherPlayer.Cards[cardType] = 0
 	}
 
+	return nil
+}
+
+func (context *gameContext) play2Resource(cards [2]int) error {
+	currentPlayer := context.getCurrentPlayer()
+
+	banker := context.Bank
+	banker.Begin()
+
+	for _, cardType := range cards {
+		if _, err := banker.Give(cardType, 1); err != nil {
+			banker.Rollback()
+			return err
+		}
+		currentPlayer.Cards[cardType]++
+	}
+
+	banker.Commit()
+
+	return nil
+}
+
+func (context *gameContext) play2Road(roads [][2]int) error {
+	currentPlayer := context.getCurrentPlayer()
+	for _, road := range roads {
+		if road[0] > road[1] {
+			s := road[1]
+			road[1] = road[0]
+			road[0] = s
+		}
+		if err := context.validateRoadPlacement(road); err != nil {
+			return err
+		}
+	}
+	for _, road := range roads {
+		currentPlayer.Roads = append(currentPlayer.Roads, road)
+	}
 	return nil
 }
 
