@@ -1,7 +1,6 @@
-package game
+package main
 
 import (
-	"catans/utils"
 	"fmt"
 	"testing"
 )
@@ -232,12 +231,12 @@ func TestPlayMonopoly(t *testing.T) {
 		}
 	}
 
-	if utils.Contains(game.context.Players[1].DevCards, DevCardMonopoly) {
+	if Contains(game.context.Players[1].DevCards, DevCardMonopoly) {
 		t.Log("expected monopoly card removed from current player, failed.")
 		t.Fail()
 	}
 
-	if !utils.Contains(game.context.Players[0].DevCards, DevCardMonopoly) {
+	if !Contains(game.context.Players[0].DevCards, DevCardMonopoly) {
 		t.Log("expected to have monopoly card, failed.")
 		t.Fail()
 	}

@@ -1,4 +1,4 @@
-package utils
+package main
 
 func Contains(s []int, e int) bool {
 	for _, a := range s {

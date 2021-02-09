@@ -1,4 +1,4 @@
-package game
+package main
 
 type Setting struct {
 	TurnTimeOut     bool

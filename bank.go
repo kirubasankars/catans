@@ -1,7 +1,6 @@
-package game
+package main
 
 import (
-	"catans/utils"
 	"errors"
 	"math/rand"
 )
@@ -47,7 +46,7 @@ func (bank *Bank) Give(cardType int, count int) (int, error) {
 
 func (bank *Bank) Take(cardType int, count int) error {
 	if bank.cards[cardType] > 19 {
-		return errors.New(utils.ErrInvalidOperation)
+		return errors.New(ErrInvalidOperation)
 	}
 	bank.cards[cardType] = bank.cards[cardType] + count
 	return nil

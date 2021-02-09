@@ -1,7 +1,6 @@
-package game
+package main
 
 import (
-	"catans/utils"
 	"fmt"
 	"strings"
 )
@@ -36,10 +35,10 @@ type path struct {
 func (player Player) uniqueRoadNodes() []int {
 	var nodes []int
 	for _, road := range player.Roads {
-		if !utils.Contains(nodes, road[0]) {
+		if !Contains(nodes, road[0]) {
 			nodes = append(nodes, road[0])
 		}
-		if !utils.Contains(nodes, road[1]) {
+		if !Contains(nodes, road[1]) {
 			nodes = append(nodes, road[1])
 		}
 	}

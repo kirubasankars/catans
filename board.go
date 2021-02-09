@@ -1,8 +1,6 @@
-package board
+package main
 
 import (
-	"catans/board/maps"
-	"catans/utils"
 	"fmt"
 	"strings"
 )
@@ -47,7 +45,7 @@ func (board Board) GetAvailableIntersections(occupied []int) []int {
 	}
 	keys := make([]int, 0, len(intersections))
 	for k := range intersections {
-		if !utils.Contains(occupied, k) {
+		if !Contains(occupied, k) {
 			keys = append(keys, k)
 		}
 	}
@@ -114,7 +112,7 @@ func (board Board) JSON() string {
 func NewBoard(ID int) Board {
 	var grid = new(Grid)
 	if ID == 0 {
-		m := maps.DefaultMap{}
+		m := DefaultMap{}
 		grid.Build(m)
 	}
 	board := new(Board)

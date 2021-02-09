@@ -1,4 +1,4 @@
-package game
+package main
 
 //func TestLongestRoad1(t *testing.T) {
 //	player := new(Player)

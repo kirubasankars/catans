@@ -1,4 +1,4 @@
-package game
+package main
 
 // 0 - lumber
 // 1 - brick
@@ -13,8 +13,6 @@ package game
 // 4 - mountain
 
 import (
-	"catans/board"
-	"catans/utils"
 	"container/list"
 	"errors"
 	"fmt"
@@ -38,7 +36,7 @@ type gameTrade struct {
 }
 
 type gameContext struct {
-	board        board.Board
+	board        Board
 	tradeCounter int
 	trades       []*gameTrade
 
@@ -57,22 +55,22 @@ func (context gameContext) getGamePhase() string {
 func (context *gameContext) putSettlement(validate bool, intersection int) error {
 	if validate {
 		availableIntersections, _ := context.getPossibleSettlementLocations()
-		if !utils.Contains(availableIntersections, intersection) {
-			return errors.New(utils.ErrInvalidOperation)
+		if !Contains(availableIntersections, intersection) {
+			return errors.New(ErrInvalidOperation)
 		}
 	}
 	currentPlayer := context.getCurrentPlayer()
 
 	if Phase2 == context.Phase || Phase3 == context.Phase {
 		if context.getActionString() != ActionPlaceSettlement {
-			return errors.New(utils.ErrInvalidOperation)
+			return errors.New(ErrInvalidOperation)
 		}
 	}
 
 	if Phase4 == context.Phase {
 		cards := [][2]int{{0, 1}, {1, 1}, {2, 1}, {3, 1}}
 		if !context.isPlayerHasAllCards(currentPlayer.ID, cards) {
-			return errors.New(utils.ErrInvalidOperation)
+			return errors.New(ErrInvalidOperation)
 		}
 
 		banker := context.Bank
@@ -114,12 +112,12 @@ func (context *gameContext) upgradeSettlement(intersection int) error {
 			}
 		}
 		if settlement == nil {
-			return errors.New(utils.ErrInvalidOperation)
+			return errors.New(ErrInvalidOperation)
 		}
 
 		cards := [][2]int{{3, 2}, {4, 3}}
 		if !context.isPlayerHasAllCards(currentPlayer.ID, cards) {
-			return errors.New(utils.ErrInvalidOperation)
+			return errors.New(ErrInvalidOperation)
 		}
 
 		settlement.Upgraded = true
@@ -135,7 +133,7 @@ func (context *gameContext) upgradeSettlement(intersection int) error {
 
 		return nil
 	}
-	return errors.New(utils.ErrInvalidOperation)
+	return errors.New(ErrInvalidOperation)
 }
 
 func (context *gameContext) buyDevelopmentCard() error {
@@ -143,7 +141,7 @@ func (context *gameContext) buyDevelopmentCard() error {
 	if Phase4 == context.Phase {
 		cards := [][2]int{{2, 1}, {3, 1}, {4, 1}}
 		if !context.isPlayerHasAllCards(currentPlayer.ID, cards) {
-			return errors.New(utils.ErrInvalidOperation)
+			return errors.New(ErrInvalidOperation)
 		}
 
 		context.Bank.Begin()
@@ -164,7 +162,7 @@ func (context *gameContext) buyDevelopmentCard() error {
 
 		context.Bank.Commit()
 	}
-	return errors.New(utils.ErrInvalidOperation)
+	return errors.New(ErrInvalidOperation)
 }
 
 func (context *gameContext) getPossibleRoads() ([][2]int, error) {
@@ -180,10 +178,10 @@ func (context *gameContext) getPossibleRoads() ([][2]int, error) {
 			i++
 		}
 		for _, road := range currentPlayer.Roads {
-			if !utils.Contains(occupiedIns, road[0]) {
+			if !Contains(occupiedIns, road[0]) {
 				occupiedIns[i] = road[0]
 			}
-			if !utils.Contains(occupiedIns, road[1]) {
+			if !Contains(occupiedIns, road[1]) {
 				occupiedIns[i] = road[1]
 			}
 			i++
@@ -232,7 +230,7 @@ func (context *gameContext) getPossibleRoads() ([][2]int, error) {
 
 		if Phase2 == context.Phase {
 			if context.getActionString() != ActionPlaceRoad {
-				return nil, errors.New(utils.ErrInvalidOperation)
+				return nil, errors.New(ErrInvalidOperation)
 			}
 			currentPlayer := context.getCurrentPlayer()
 
@@ -246,7 +244,7 @@ func (context *gameContext) getPossibleRoads() ([][2]int, error) {
 		if Phase3 == context.Phase {
 			nextAction := context.getAction()
 			if nextAction != nil && nextAction.Name != ActionPlaceRoad {
-				return nil, errors.New(utils.ErrInvalidOperation)
+				return nil, errors.New(ErrInvalidOperation)
 			}
 
 			currentPlayer := context.getCurrentPlayer()
@@ -264,7 +262,7 @@ func (context *gameContext) getPossibleRoads() ([][2]int, error) {
 		}
 	}
 
-	return nil, errors.New(utils.ErrInvalidOperation)
+	return nil, errors.New(ErrInvalidOperation)
 }
 
 func (context *gameContext) getPossibleSettlementLocations() ([]int, error) {
@@ -280,7 +278,7 @@ func (context *gameContext) getPossibleSettlementLocations() ([]int, error) {
 		for _, v := range occupiedIns {
 			neighborIntersections := context.board.GetNeighborIntersections1(v)
 			for _, ni := range neighborIntersections {
-				if !utils.Contains(occupiedIns, ni) {
+				if !Contains(occupiedIns, ni) {
 					occupiedIns = append(occupiedIns, ni)
 				}
 			}
@@ -289,17 +287,17 @@ func (context *gameContext) getPossibleSettlementLocations() ([]int, error) {
 		currentPlayer := context.getCurrentPlayer()
 		var roadsIntersections []int
 		for _, road := range currentPlayer.Roads {
-			if !utils.Contains(occupiedIns, road[0]) {
+			if !Contains(occupiedIns, road[0]) {
 				roadsIntersections = append(roadsIntersections, road[0])
 			}
-			if !utils.Contains(occupiedIns, road[1]) {
+			if !Contains(occupiedIns, road[1]) {
 				roadsIntersections = append(roadsIntersections, road[1])
 			}
 		}
 
 		var availableIntersections []int
 		for _, ins := range roadsIntersections {
-			if !utils.Contains(occupiedIns, ins) {
+			if !Contains(occupiedIns, ins) {
 				availableIntersections = append(availableIntersections, ins)
 			}
 		}
@@ -308,7 +306,7 @@ func (context *gameContext) getPossibleSettlementLocations() ([]int, error) {
 
 	if Phase2 == context.Phase || Phase3 == context.Phase {
 		if context.getActionString() != ActionPlaceSettlement {
-			return nil, errors.New(utils.ErrInvalidOperation)
+			return nil, errors.New(ErrInvalidOperation)
 		}
 		occupied := make([]int, 0)
 		for _, player := range context.Players {
@@ -319,7 +317,7 @@ func (context *gameContext) getPossibleSettlementLocations() ([]int, error) {
 		return context.board.GetAvailableIntersections(occupied), nil
 	}
 
-	return nil, errors.New(utils.ErrInvalidOperation)
+	return nil, errors.New(ErrInvalidOperation)
 }
 
 func (context *gameContext) validateRoadPlacement(road [2]int) error {
@@ -332,7 +330,7 @@ func (context *gameContext) validateRoadPlacement(road [2]int) error {
 		}
 	}
 	if !matched {
-		return errors.New(utils.ErrInvalidOperation)
+		return errors.New(ErrInvalidOperation)
 	}
 	return nil
 }
@@ -353,7 +351,7 @@ func (context *gameContext) putRoad(validate bool, road [2]int) error {
 		currentPlayer := context.getCurrentPlayer()
 		cards := [][2]int{{0, 1}, {1, 1}}
 		if !context.isPlayerHasAllCards(currentPlayer.ID, cards) {
-			return errors.New(utils.ErrInvalidOperation)
+			return errors.New(ErrInvalidOperation)
 		}
 
 		banker := context.Bank
@@ -372,7 +370,7 @@ func (context *gameContext) putRoad(validate bool, road [2]int) error {
 
 	if Phase2 == context.Phase || Phase3 == context.Phase {
 		if context.getActionString() != ActionPlaceRoad {
-			return errors.New(utils.ErrInvalidOperation)
+			return errors.New(ErrInvalidOperation)
 		}
 		currentPlayer := context.getCurrentPlayer()
 		currentPlayer.Roads = append(currentPlayer.Roads, road)
@@ -387,7 +385,7 @@ func (context *gameContext) handOverCards(player *Player, cardType int, count in
 
 func (context *gameContext) updateGameSetting(gs Setting) error {
 	if context.State.Phase != Phase1 || gs.NumberOfPlayers <= 1 || gs.Map < 0 || gs.Map >= 1 {
-		return errors.New(utils.ErrInvalidOperation)
+		return errors.New(ErrInvalidOperation)
 	}
 	context.Setting = gs
 	for i := 0; i < gs.NumberOfPlayers; i++ {
@@ -395,7 +393,7 @@ func (context *gameContext) updateGameSetting(gs Setting) error {
 		player.ID = i
 		context.Players = append(context.Players, player)
 	}
-	context.board = board.NewBoard(gs.Map)
+	context.board = NewBoard(gs.Map)
 	context.Tiles = context.board.GetTiles()
 	return nil
 }
@@ -424,7 +422,7 @@ func (context *gameContext) bankTrade(gives, wants [][2]int) error {
 	if context.Phase == Phase4 && len(gives) == 1 && len(wants) == 1 && wants[0][1] == 1 && gives[0][1] > 1 {
 		currentPlayer := context.getCurrentPlayer()
 		if !context.isSafeTrade(gives, wants) || !context.isPlayerHasAllCards(currentPlayer.ID, gives) {
-			return errors.New(utils.ErrInvalidOperation)
+			return errors.New(ErrInvalidOperation)
 		}
 
 		banker := context.Bank
@@ -477,7 +475,7 @@ func (context *gameContext) bankTrade(gives, wants [][2]int) error {
 
 	}
 
-	return errors.New(utils.ErrInvalidOperation)
+	return errors.New(ErrInvalidOperation)
 }
 
 func (context *gameContext) getTrade(tradeID int) *gameTrade {
@@ -493,7 +491,7 @@ func (context *gameContext) setupTrade(gives [][2]int, wants [][2]int) error {
 
 	currentPlayer := context.getCurrentPlayer()
 	if !context.isSafeTrade(gives, wants) || !context.isPlayerHasAllCards(currentPlayer.ID, gives) {
-		return errors.New(utils.ErrInvalidOperation)
+		return errors.New(ErrInvalidOperation)
 	}
 
 	for _, otherPlayer := range context.Players {
@@ -525,7 +523,7 @@ func (context *gameContext) setupTrade(gives [][2]int, wants [][2]int) error {
 func (context *gameContext) overrideTrade(playerID, tradeID int, gives [][2]int, wants [][2]int) error {
 	var trade = context.getTrade(tradeID)
 	if trade == nil || !context.isSafeTrade(gives, wants) || playerID != trade.To || !context.isPlayerHasAllCards(trade.To, gives) {
-		return errors.New(utils.ErrInvalidOperation)
+		return errors.New(ErrInvalidOperation)
 	}
 
 	currentPlayer := context.getCurrentPlayer()
@@ -547,7 +545,7 @@ func (context *gameContext) overrideTrade(playerID, tradeID int, gives [][2]int,
 func (context *gameContext) acceptTrade(playerID, tradeID int) error {
 	trade := context.getTrade(tradeID)
 	if trade == nil || trade.OK != 0 || playerID != trade.To {
-		return errors.New(utils.ErrInvalidOperation)
+		return errors.New(ErrInvalidOperation)
 	}
 	trade.OK = 1
 	return nil
@@ -556,7 +554,7 @@ func (context *gameContext) acceptTrade(playerID, tradeID int) error {
 func (context *gameContext) rejectTrade(playerID, tradeID int) error {
 	trade := context.getTrade(tradeID)
 	if trade == nil || trade.OK != 0 || playerID != trade.To {
-		return errors.New(utils.ErrInvalidOperation)
+		return errors.New(ErrInvalidOperation)
 	}
 	trade.OK = -1
 	return nil
@@ -565,7 +563,7 @@ func (context *gameContext) rejectTrade(playerID, tradeID int) error {
 func (context *gameContext) completeTrade(tradeID int) error {
 	trade := context.getTrade(tradeID)
 	if trade == nil || trade.OK != 1 {
-		return errors.New(utils.ErrInvalidOperation)
+		return errors.New(ErrInvalidOperation)
 	}
 
 	trade.OK = 2
@@ -612,7 +610,7 @@ func (context gameContext) isPlayerHasAllCards(playerID int, cards [][2]int) boo
 
 func (context *gameContext) startPhase2() error {
 	if context.Phase != Phase1 {
-		return errors.New(utils.ErrInvalidOperation)
+		return errors.New(ErrInvalidOperation)
 	}
 	context.Phase = Phase2
 	context.CurrentPlayerID = 0
@@ -731,7 +729,7 @@ func (context *gameContext) endAction() error {
 		return nil
 	}
 
-	return errors.New(utils.ErrInvalidOperation)
+	return errors.New(ErrInvalidOperation)
 }
 
 func (context *gameContext) isActionTimeout() bool {
@@ -855,7 +853,7 @@ func (context gameContext) calculateLongestRoad(player Player, otherPlayersSettl
 
 				if road[0] == item.intersection || road[1] == item.intersection {
 					////broken road check
-					//if otherPlayersSettlements != nil && utils.Contains(otherPlayersSettlements, r1) {
+					//if otherPlayersSettlements != nil && Contains(otherPlayersSettlements, r1) {
 					//	pathEnd = true
 					//}
 
@@ -985,13 +983,13 @@ func (context *gameContext) playMonopoly(cardType int) error {
 	for idx, devCard := range currentPlayer.DevCards {
 		if devCard == DevCardMonopoly {
 			hasMonopoly = true
-			currentPlayer.DevCards = utils.Remove(currentPlayer.DevCards, idx)
+			currentPlayer.DevCards = Remove(currentPlayer.DevCards, idx)
 			break
 		}
 	}
 
 	if !hasMonopoly {
-		return errors.New(utils.ErrInvalidOperation)
+		return errors.New(ErrInvalidOperation)
 	}
 
 	for _, otherPlayer := range context.Players {

@@ -1,17 +1,16 @@
-package webserver
+package main
 
 import (
-	"catans/game"
 	"fmt"
 	"log"
 	"net/http"
 )
 
 func StartWebServer() {
-	lobby := game.NewLobby()
+	lobby := NewLobby()
 
 	http.HandleFunc("/create_game", func(w http.ResponseWriter, r *http.Request) {
-		gs := game.Setting{NumberOfPlayers: 2}
+		gs := Setting{NumberOfPlayers: 2}
 		gameID, _ := lobby.CreateGame(gs)
 		w.Write([]byte(gameID))
 	})

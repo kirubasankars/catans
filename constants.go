@@ -1,5 +1,6 @@
-package game
+package main
 
+const ErrInvalidOperation = "invalid operation"
 // Phases
 const Phase1 = "SETUP"
 const Phase2 = "INITIAL_SETTLEMENT1"
