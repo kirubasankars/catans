@@ -8,11 +8,11 @@ import (
 )
 
 type Board struct {
-	g *grid
+	grid *Grid
 }
 
 func (board Board) GetNeighborIntersections1(intersection int) []int {
-	thisIntersection := board.g.intersections[intersection]
+	thisIntersection := board.grid.intersections[intersection]
 	neighborIntersections := thisIntersection.neighbors
 	var output = make([]int, len(thisIntersection.neighbors))
 	for _, ins := range neighborIntersections {
@@ -23,7 +23,7 @@ func (board Board) GetNeighborIntersections1(intersection int) []int {
 }
 
 func (board Board) GetNeighborIntersections2(intersection int) [][2]int {
-	thisIntersection := board.g.intersections[intersection]
+	thisIntersection := board.grid.intersections[intersection]
 	neighborIntersections := thisIntersection.neighbors
 	var output = make([][2]int, len(thisIntersection.neighbors))
 	for _, ins := range neighborIntersections {
@@ -37,7 +37,7 @@ func (board Board) GetNeighborIntersections2(intersection int) [][2]int {
 }
 
 func (board Board) GetAvailableIntersections(occupied []int) []int {
-	intersections := board.g.intersections
+	intersections := board.grid.intersections
 	l := len(occupied)
 	for i := 0; i < l; i++ {
 		occupiedNeighbors := intersections[occupied[i]].neighbors
@@ -55,7 +55,7 @@ func (board Board) GetAvailableIntersections(occupied []int) []int {
 }
 
 func (board Board) GetTileIndices(intersection int) []int {
-	coordinator := board.g.intersections[intersection]
+	coordinator := board.grid.intersections[intersection]
 	var indices = make([]int, len(coordinator.nodes))
 	for idx, n := range coordinator.nodes {
 		indices[idx] = n.index
@@ -64,10 +64,9 @@ func (board Board) GetTileIndices(intersection int) []int {
 }
 
 func (board Board) GetTiles() [][2]int {
-	var tiles = make([][2]int, len(board.g.grid))
-	var chits = []int{10, 2, 9, 12, 6, 4, 10, 9, 11, 3, 8, 8, 3, 4, 5, 5, 6, 11}
+	var tiles = make([][2]int, len(board.grid.nodes))
 	var tIndex = 0
-	for idx, n := range board.g.grid {
+	for idx, n := range board.grid.nodes {
 		var rt = -1
 		var token = -1
 		switch n.resource {
@@ -85,7 +84,7 @@ func (board Board) GetTiles() [][2]int {
 			rt = -1
 		}
 		if rt != -1 {
-			token = chits[tIndex]
+			token = n.token
 			tIndex++
 		}
 		tiles[idx] = [2]int{rt, token}
@@ -95,7 +94,7 @@ func (board Board) GetTiles() [][2]int {
 
 func (board Board) JSON() string {
 	tiles := board.GetTiles()
-	makeIntersections := func(l []*intersection) string {
+	makeIntersections := func(l []*Intersection) string {
 		var nodes []string
 		for _, h := range l {
 			nodes = append(nodes, fmt.Sprintf("{index:%d,x:%f,y:%f, hasPort:%t, portResource:'%s'}", h.index, h.x, h.y, h.hasPort, h.portResource))
@@ -103,22 +102,23 @@ func (board Board) JSON() string {
 		return "[" + strings.Join(nodes, ",") + "]"
 	}
 	var nodes []string
-	for _, h := range board.g.grid {
+	for _, h := range board.grid.nodes {
 		if h.resource == "-" || h.resource == "s" {
 			continue
 		}
-		nodes = append(nodes, fmt.Sprintf("{index:%d,x:%f,y:%f,intersections:%s,port:%t,port_direction:%f,resoure:'%s',token:%d}", h.index, h.x, h.y, makeIntersections(h.intersections), h.port, h.direction, h.resource, tiles[h.index][1]))
+		nodes = append(nodes, fmt.Sprintf("{index:%d,x:%f,y:%f,intersections:%s,port:%t,port_direction:%f,resoure:'%s',token:%d}", h.index, h.x, h.y, makeIntersections(h.intersections), h.port, h.portDirection, h.resource, tiles[h.index][1]))
 	}
 	return "[" + strings.Join(nodes, ",") + "]"
 }
 
 func NewBoard(ID int) Board {
-	var g = new(grid)
+	var grid = new(Grid)
 	if ID == 0 {
-		g.Build(maps.DefaultMap{}.GetTileConfig())
+		m := maps.DefaultMap{}
+		grid.Build(m)
 	}
 	board := new(Board)
-	board.g = g
+	board.grid = grid
 	fmt.Println(board.JSON())
 	return *board
 }

@@ -14,3 +14,7 @@ s,f,t,d,t,m,sl4
 -,-,so0,s,sb5,s,-
 	`
 }
+
+func (defaultMap DefaultMap) GetChits() []int {
+	return []int{10, 2, 9, 12, 6, 4, 10, 9, 11, 3, 8, 8, 3, 4, 5, 5, 6, 11}
+}
