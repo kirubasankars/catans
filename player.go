@@ -7,6 +7,17 @@ import (
 
 type Player struct {
 	ID          int
+	// 0 - lumber
+	// 1 - brick
+	// 2 - wool
+	// 3 - grain
+	// 4 - ore
+
+	// 0 - tree
+	// 1 - hill
+	// 2 - pasture
+	// 3 - field
+	// 4 - mountain
 	Cards       [5]int
 	Roads       [][2]int
 	Settlements []Settlement

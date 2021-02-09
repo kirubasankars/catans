@@ -1,17 +1,5 @@
 package main
 
-// 0 - lumber
-// 1 - brick
-// 2 - wool
-// 3 - grain
-// 4 - ore
-
-// 0 - tree
-// 1 - hill
-// 2 - pasture
-// 3 - field
-// 4 - mountain
-
 import (
 	"container/list"
 	"errors"

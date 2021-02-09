@@ -35,15 +35,14 @@ type Intersection struct {
 	neighbors []*Intersection
 }
 
-type Grid struct {
-	r             float64
-	nodes         []*Hexagon
-	intersections []*Intersection
-}
-
 type MapConfig interface {
 	GetTileConfig() string
 	GetChits() []int
+}
+
+type Grid struct {
+	nodes         []*Hexagon
+	intersections []*Intersection
 }
 
 func (grid *Grid) makeGrid(h int, w int, tileConfig []string, tokens []int) {
@@ -87,17 +86,22 @@ func (grid *Grid) makeGrid(h int, w int, tileConfig []string, tokens []int) {
 		y = y + (r / 2) + r
 	}
 
+	if tokenIdx < len(tokens) {
+		panic(ErrInvalidOperation)
+	}
+
 	grid.nodes = nodes
 }
 
 func (grid *Grid) makeIntersections() {
 	var a = 2 * math.Pi / 6
-	var r = grid.r
+	var r = 50.0
 	var ir = r * 0.20
 
 	var id = 0
 	var intersections []*Intersection
 	var intersectionsMap = make(map[string]*Intersection)
+
 	for _, node := range grid.nodes {
 		if node.resource == "-" || node.resource == "s" || node.port {
 			continue
@@ -191,6 +195,7 @@ func (grid *Grid) makeIntersections() {
 		}
 		ins1.neighbors = neighbors
 	}
+
 	grid.intersections = intersections
 }
 
@@ -231,7 +236,6 @@ func (grid *Grid) parseTiles(m string) ([]string, int, int) {
 }
 
 func (grid *Grid) Build(config MapConfig) {
-	grid.r = 50
 	tilesConfig, height, width := grid.parseTiles(config.GetTileConfig())
 	chits := config.GetChits()
 	grid.makeGrid(height, width, tilesConfig, chits)

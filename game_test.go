@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestGame1(t *testing.T) {
+func TestGameRollDiceAndCards(t *testing.T) {
 
 	game := NewGame()
 	gs := *new(GameSetting)
@@ -237,4 +237,8 @@ func TestPlayMonopoly(t *testing.T) {
 		t.Log("expected to have monopoly card, failed.")
 		t.Fail()
 	}
+}
+
+func TestAvailableRoads(t *testing.T) {
+
 }
