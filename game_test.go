@@ -14,7 +14,6 @@ func TestGameRollDiceAndCards(t *testing.T) {
 	gs.TurnTimeOut = false
 	game.UpdateGameSetting(gs)
 	game.Start()
-
 	//player 0
 	game.PutSettlement(14)
 	game.PutRoad([2]int{14, 15})

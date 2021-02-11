@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -54,7 +55,29 @@ func (game *Game) RollDice() error {
 }
 
 func (game *Game) UI() string {
-	return game.context.board.JSON()
+	board := game.context.board
+	tiles := game.context.Tiles
+	var nodes []string
+	for idx, h := range board.grid.nodes {
+		if h.resource == "-" || h.resource == "s" {
+			continue
+		}
+		nodes = append(nodes, fmt.Sprintf("{id:%d,x:%f,y:%f,r:%f,rs:'%s'}", h.index, h.x, h.y, h.r, convertCardTypeToTerrain(tiles[idx][0])))
+	}
+	var intersections []string
+	for _, ins := range board.grid.intersections {
+		var rs = ""
+		if ins.hasPort {
+			for _, n := range ins.nodes {
+				if n.port {
+					rs = convertCardTypeToTerrain(tiles[n.index][0])
+					break
+				}
+			}
+		}
+		intersections = append(intersections, fmt.Sprintf("{id:%d,x:%f,y:%f,r:%f,port:%t,rs:'%s'}", ins.index, ins.x, ins.y, ins.r,ins.hasPort, rs))
+	}
+	return "{'nodes': [" + strings.Join(nodes, ",") + "], 'intersections':["+ strings.Join(intersections, ",")+"]}"
 }
 
 func (game Game) BankTrade(gives [][2]int, wants [][2]int) error {

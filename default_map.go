@@ -6,11 +6,11 @@ type DefaultMap struct {
 func (defaultMap DefaultMap) GetTileConfig() string {
 	return `
 -,-,sw2,s,s?3,s,-
--,s,m,p,t,sg3,-
--,s?1,f,h,p,h,s
-s,f,t,d,t,m,sl4
--,s?1,t,m,f,p,s
--,s,h,f,p,s?5,-
+-,s,o,w,l,sg3,-
+-,s?1,g,b,w,b,s
+s,g,l,d,l,o,sl4
+-,s?1,l,b,g,w,s
+-,s,b,g,w,s?5,-
 -,-,so0,s,sb5,s,-
 	`
 }

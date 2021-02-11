@@ -18,8 +18,8 @@ type Hexagon struct {
 	port          bool
 	portDirection float64
 
-	neighbors     []*Hexagon
-	intersections []*Intersection
+	//neighbors     []*Hexagon
+	//intersections []*Intersection
 }
 
 type Intersection struct {
@@ -135,16 +135,16 @@ func (grid *Grid) makeIntersections() {
 
 			ins.nodes = nodes
 			neighbors = append(neighbors, nodes...)
-			node.intersections = append(node.intersections, ins)
+			//node.intersections = append(node.intersections, ins)
 		}
 
 		//ignore myself from neighbors
-		for _, n := range neighbors {
-			if n.index == node.index {
-				continue
-			}
-			node.neighbors = append(node.neighbors, n)
-		}
+		//for _, n := range neighbors {
+		//	if n.index == node.index {
+		//		continue
+		//	}
+		//	node.neighbors = append(node.neighbors, n)
+		//}
 	}
 
 	getNextSide := func(s float64) float64 {
