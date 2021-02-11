@@ -10,7 +10,7 @@ func (defaultMap DefaultMap) GetTileConfig() string {
 -,s?1,g,b,w,b,s
 s,g,l,d,l,o,sl4
 -,s?1,l,b,g,w,s
--,s,b,g,w,s?5,-
+-,s,o,g,w,s?5,-
 -,-,so0,s,sb5,s,-
 	`
 }

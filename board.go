@@ -71,12 +71,14 @@ func (board Board) GetTiles() [][2]int {
 			rt = 3
 		case "o":
 			rt = 4
-		case "d":
+		case "?":
 			rt = -1
-		case "s":
+		case "d":
 			rt = -2
-		case "-":
+		case "s":
 			rt = -3
+		case "-":
+			rt = -4
 		}
 		tiles[idx] = [2]int{rt, n.token}
 	}
