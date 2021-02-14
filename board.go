@@ -60,25 +60,25 @@ func (board Board) GetTiles() [][2]int {
 	var tiles = make([][2]int, len(board.grid.nodes))
 	for idx, n := range board.grid.nodes {
 		var rt = -1
-		switch n.resource {
-		case "l":
+		switch n.terrain {
+		case "t":
 			rt = 0
-		case "b":
+		case "h":
 			rt = 1
-		case "w":
+		case "p":
 			rt = 2
-		case "g":
+		case "f":
 			rt = 3
-		case "o":
+		case "m":
 			rt = 4
-		case "?":
-			rt = -1
-		case "d":
-			rt = -2
-		case "s":
-			rt = -3
+		case "g":
+			rt = 5
 		case "-":
-			rt = -4
+			rt = -1
+		case "s":
+			rt = -2
+		case "d":
+			rt = -3
 		}
 		tiles[idx] = [2]int{rt, n.token}
 	}
@@ -98,4 +98,28 @@ func NewBoard(ID int) Board {
 	board := new(Board)
 	board.grid = grid
 	return *board
+}
+
+func convertCardTypeToTerrain(cardType int) string {
+	switch cardType {
+	case 0:
+		return "t"
+	case 1:
+		return "h"
+	case 2:
+		return "p"
+	case 3:
+		return "f"
+	case 4:
+		return "m"
+	case 5:
+		return "g"
+	case -1:
+		return "-"
+	case -2:
+		return "s"
+	case -3:
+		return "d"
+	}
+	return ""
 }

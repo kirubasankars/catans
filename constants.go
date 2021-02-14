@@ -1,6 +1,7 @@
 package main
 
 const ErrInvalidOperation = "invalid operation"
+
 // Phases
 const Phase1 = "SETUP"
 const Phase2 = "INITIAL_SETTLEMENT1"
@@ -23,5 +24,3 @@ const DevCardVPPoint = 1
 const DevCardMonopoly = 2
 const DevCard2Resource = 3
 const DevCard2Road = 4
-
-

@@ -6,7 +6,7 @@ import (
 )
 
 type Player struct {
-	ID          int
+	ID int
 	// 0 - lumber
 	// 1 - brick
 	// 2 - wool

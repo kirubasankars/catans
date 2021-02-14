@@ -8,18 +8,21 @@ import (
 )
 
 type Hexagon struct {
-	index    int
-	x        float64
-	y        float64
-	r        float64
-	resource string
-	token    int
-
-	port          bool
-	portDirection float64
+	index   int
+	x       float64
+	y       float64
+	r       float64
+	terrain string
+	token   int
+	port    *HexagonPort
 
 	//neighbors     []*Hexagon
 	//intersections []*Intersection
+}
+
+type HexagonPort struct {
+	direction float64
+	resource  string
 }
 
 type Intersection struct {
@@ -28,8 +31,7 @@ type Intersection struct {
 	y     float64
 	r     float64
 
-	hasPort      bool
-	portResource string
+	port *HexagonPort
 
 	nodes     []*Hexagon
 	neighbors []*Intersection
@@ -58,15 +60,14 @@ func (grid *Grid) makeGrid(h int, w int, tileConfig []string, tokens []int) {
 	for i := 0; i < h; i++ {
 		for j := 0; j < w; j++ {
 			tc := tileConfig[idx]
-			n := Hexagon{x: x, y: y, r: r, index: idx, resource: tc}
+			n := Hexagon{x: x, y: y, r: r, index: idx, terrain: tc}
 			if len(tc) == 3 {
-				n.port = true
-				n.resource = string(tc[1])
 				d, _ := strconv.Atoi(string(tc[2]))
-				n.portDirection = float64(d)
+				n.port = &HexagonPort{direction: float64(d), resource: string(tc[1])}
+				n.terrain = "-"
 			}
 
-			if !(n.resource == "d" || n.resource == "-" || n.resource == "s" || n.port) { //ignore any thing is not tokens
+			if !(n.terrain == "d" || n.terrain == "-" || n.terrain == "s" || n.port != nil) { //ignore any thing is not tokens
 				n.token = tokens[tokenIdx]
 				tokenIdx++
 			}
@@ -103,7 +104,7 @@ func (grid *Grid) makeIntersections() {
 	var intersectionsMap = make(map[string]*Intersection)
 
 	for _, node := range grid.nodes {
-		if node.resource == "-" || node.resource == "s" || node.port {
+		if node.terrain == "-" || node.terrain == "s" || node.port != nil {
 			continue
 		}
 		var neighbors []*Hexagon
@@ -155,7 +156,7 @@ func (grid *Grid) makeIntersections() {
 	}
 
 	for _, node := range grid.nodes {
-		if !node.port {
+		if node.port == nil {
 			continue
 		}
 		var portIntersections []*Intersection
@@ -166,19 +167,17 @@ func (grid *Grid) makeIntersections() {
 		}
 
 		for _, ins := range portIntersections {
-			var px = node.x + r*math.Cos((a*node.portDirection)+11)
-			var py = node.y + r*math.Sin((a*node.portDirection)+11)
+			var px = node.x + r*math.Cos((a*node.port.direction)+11)
+			var py = node.y + r*math.Sin((a*node.port.direction)+11)
 			if grid.circlesIntersect(ins.x, ins.y, ins.r, px, py, ins.r) {
-				ins.hasPort = true
-				ins.portResource = node.resource
+				ins.port = node.port
 			}
 
-			var ns = getNextSide(node.portDirection)
+			var ns = getNextSide(node.port.direction)
 			px = node.x + r*math.Cos((a*ns)+11)
 			py = node.y + r*math.Sin((a*ns)+11)
 			if grid.circlesIntersect(ins.x, ins.y, ins.r, px, py, ins.r) {
-				ins.hasPort = true
-				ins.portResource = node.resource
+				ins.port = node.port
 			}
 		}
 	}

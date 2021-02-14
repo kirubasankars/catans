@@ -629,7 +629,7 @@ func (context *GameContext) startPhase4() error {
 		return errors.New(ErrInvalidOperation)
 	}
 	context.phase = Phase4
-	context.giveInitialFreeCards()
+	//context.giveInitialFreeCards()
 	context.CurrentPlayerID = 0
 	context.scheduleAction(ActionRollDice)
 	return nil

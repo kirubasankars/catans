@@ -59,11 +59,11 @@ func (game *Game) UI() string {
 	tiles := game.context.Tiles
 	var nodes []string
 	for idx, h := range board.grid.nodes {
-		if h.resource == "-" || h.resource == "s" {
+		if h.terrain == "-" || h.terrain == "s" {
 			continue
 		}
-		if h.port {
-			nodes = append(nodes, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"rs":"%s","port":true,"direction":%.0f}`, h.index, h.x, h.y, h.r, convertCardTypeToTerrain(tiles[idx][0]), h.portDirection))
+		if h.port != nil {
+			nodes = append(nodes, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"rs":"%s","port":true,"direction":%.0f}`, h.index, h.x, h.y, h.r, convertCardTypeToTerrain(tiles[idx][0]), h.port.direction))
 		} else {
 			nodes = append(nodes, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"rs":"%s","t":%d}`, h.index, h.x, h.y, h.r, convertCardTypeToTerrain(tiles[idx][0]), tiles[idx][1]))
 		}
@@ -71,19 +71,19 @@ func (game *Game) UI() string {
 	}
 	var intersections []string
 	for _, ins := range board.grid.intersections {
-		if ins.hasPort {
+		if ins.port != nil {
 			var rs = ""
 			var p *Hexagon
 			for _, n := range ins.nodes {
-				if n.port {
+				if n.port != nil {
 					rs = convertCardTypeToTerrain(tiles[n.index][0])
 					p = n
 					break
 				}
 			}
-			intersections = append(intersections, fmt.Sprintf(`{"id":%d,"x":%0.2f,"y":%.2f,"r":%.0f,"hasport":%t,"port":{"rs":"%s","x":%.2f,"y":%.2f,"r":%.0f}}`, ins.index, ins.x, ins.y, ins.r, ins.hasPort, rs, p.x, p.y, p.r))
+			intersections = append(intersections, fmt.Sprintf(`{"id":%d,"x":%0.2f,"y":%.2f,"r":%.0f,"hasport":%t,"port":{"rs":"%s","x":%.2f,"y":%.2f,"r":%.0f}}`, ins.index, ins.x, ins.y, ins.r, ins.port != nil, rs, p.x, p.y, p.r))
 		} else {
-			intersections = append(intersections, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"hasport":%t}`, ins.index, ins.x, ins.y, ins.r, ins.hasPort))
+			intersections = append(intersections, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"hasport":%t}`, ins.index, ins.x, ins.y, ins.r, ins.port != nil))
 		}
 	}
 	return "{'nodes': [" + strings.Join(nodes, ",") + "], 'intersections':[" + strings.Join(intersections, ",") + "]}"

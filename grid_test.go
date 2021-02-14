@@ -2,7 +2,7 @@ package main
 
 import "testing"
 
-type testMap1 struct {}
+type testMap1 struct{}
 
 func (tmap testMap1) GetTileConfig() string {
 	return `
@@ -24,7 +24,7 @@ func TestOneTileGrid(t *testing.T) {
 	}
 }
 
-type testMap2 struct {}
+type testMap2 struct{}
 
 func (tmap testMap2) GetTileConfig() string {
 	return `
@@ -46,7 +46,7 @@ func TestTwoTileGrid(t *testing.T) {
 	}
 }
 
-type testMap3 struct {}
+type testMap3 struct{}
 
 func (tmap testMap3) GetTileConfig() string {
 	return `
