@@ -62,10 +62,12 @@ func (game *Game) UI() string {
 		if h.terrain == "-" || h.terrain == "s" {
 			continue
 		}
+		terrain := convertCardTypeToTerrain(tiles[idx][0])
+		token := tiles[idx][1]
 		if h.port != nil {
-			nodes = append(nodes, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"terrain":"%s","port":{"direction":%.0f,"resource":"%s"}}`, h.index, h.x, h.y, h.r, convertCardTypeToTerrain(tiles[idx][0]), h.port.direction, convertCardTypeToTerrain(tiles[idx][0])))
+			nodes = append(nodes, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"terrain":"%s","port":{"direction":%.0f,"resource":"%d"}}`, h.index, h.x, h.y, h.r, terrain, h.port.direction, terrain))
 		} else {
-			nodes = append(nodes, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"terrain":"%s","token":%d}`, h.index, h.x, h.y, h.r, convertCardTypeToTerrain(tiles[idx][0]), tiles[idx][1]))
+			nodes = append(nodes, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"terrain":"%s","token":%d}`, h.index, h.x, h.y, h.r, terrain, token))
 		}
 
 	}
@@ -84,7 +86,8 @@ func (game *Game) UI() string {
 			neighbors = append(neighbors, fmt.Sprintf(`%d`, n.index))
 		}
 		if ins.port != nil {
-			intersections = append(intersections, fmt.Sprintf(`{"id":%d,"x":%0.2f,"y":%.2f,"r":%.0f,"port":{"resource":"%s","x":%.2f,"y":%.2f,"r":%.0f},"hexagons":[%s],"neighbors":[%s]}`, ins.index, ins.x, ins.y, ins.r, convertCardTypeToTerrain(tiles[ins.port.index][0]), ins.port.x, ins.port.y, ins.port.r, strings.Join(nodes,","), strings.Join(neighbors,",")))
+			terrain := convertCardTypeToTerrain(tiles[ins.port.index][0])
+			intersections = append(intersections, fmt.Sprintf(`{"id":%d,"x":%0.2f,"y":%.2f,"r":%.0f,"port":{"resource":"%s","x":%.2f,"y":%.2f,"r":%.0f},"hexagons":[%s],"neighbors":[%s]}`, ins.index, ins.x, ins.y, ins.r, terrain, ins.port.x, ins.port.y, ins.port.r, strings.Join(nodes,","), strings.Join(neighbors,",")))
 		} else {
 			intersections = append(intersections, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"hexagons":[%s],"neighbors":[%s]}`, ins.index, ins.x, ins.y, ins.r, strings.Join(nodes,","), strings.Join(neighbors,",")))
 		}

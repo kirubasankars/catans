@@ -37,7 +37,7 @@ func (board Board) GetAvailableIntersections(occupied []int) []int {
 			occupied = append(occupied, nins.index)
 		}
 	}
-	keys := make([]int, 0, len(intersections) - len(occupied))
+	keys := make([]int, 0, len(intersections)-len(occupied))
 	for k := range intersections {
 		if !Contains(occupied, k) {
 			keys = append(keys, k)
@@ -53,9 +53,35 @@ func (board Board) GetTileIndices(intersection int) []int {
 		if n.port != nil {
 			continue
 		}
-		indices =  append(indices, n.index)
+		indices = append(indices, n.index)
 	}
 	return indices
+}
+
+func convertCardTypeToTerrain(cardType int) string {
+	switch cardType {
+	case 0:
+		return "t"
+	case 1:
+		return "h"
+	case 2:
+		return "p"
+	case 3:
+		return "f"
+	case 4:
+		return "m"
+
+	case 5:
+		return "d"
+	case 6:
+		return "?"
+	case 7:
+		return "-"
+	case 8:
+		return "s"
+
+	}
+	return ""
 }
 
 func (board Board) GetTiles() [][2]int {
@@ -83,14 +109,15 @@ func (board Board) GetTiles() [][2]int {
 			rt = 3
 		case "o":
 			rt = 4
-		case "?":
-			rt = 5
-		case "-":
-			rt = -1
-		case "s":
-			rt = -2
 		case "d":
-			rt = -3
+			rt = 5
+		case "?":
+			rt = 6
+		case "-":
+			rt = 7
+		case "s":
+			rt = 8
+
 		}
 		tiles[idx] = [2]int{rt, n.token}
 	}
@@ -112,26 +139,3 @@ func NewBoard(ID int) Board {
 	return *board
 }
 
-func convertCardTypeToTerrain(cardType int) string {
-	switch cardType {
-	case 0:
-		return "t"
-	case 1:
-		return "h"
-	case 2:
-		return "p"
-	case 3:
-		return "f"
-	case 4:
-		return "m"
-	case 5:
-		return "?"
-	case -1:
-		return "-"
-	case -2:
-		return "s"
-	case -3:
-		return "d"
-	}
-	return ""
-}
