@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
-	"thayam/utils"
 	"time"
 )
 
@@ -982,7 +981,7 @@ func (context *GameContext) stealAPlayer(otherPlayerID int) error {
 	// if other player don't have settlement on that tile, throw.
 	hasSettlement := false
 	for _, s := range otherPlayer.Settlements {
-		if _, ok := utils.Contains(s.Indices, context.RobberPlacement); ok {
+		if Contains(s.Indices, context.RobberPlacement) {
 			hasSettlement = true
 		}
 	}
