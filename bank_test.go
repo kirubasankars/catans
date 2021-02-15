@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestBankGive(t *testing.T) {
+func TestBankGet(t *testing.T) {
 	bank := NewBank()
 	_, err := bank.Get(0, 1)
 	if err != nil || bank.cards[0] != 18 {
@@ -13,7 +13,7 @@ func TestBankGive(t *testing.T) {
 	}
 }
 
-func TestBankTake(t *testing.T) {
+func TestBankSet(t *testing.T) {
 	bank := NewBank()
 	bank.cards[0] = 17
 	err := bank.Set(0, 1)
@@ -27,7 +27,7 @@ func TestBankBuyDevCard(t *testing.T) {
 	bank := NewBank()
 	bank.devCardIndex = 18
 	_, err := bank.BuyDevCard()
-	if err != nil || bank.devCardIndex != 16 {
+	if err != nil || bank.devCardIndex != 17 {
 		t.Log("expected to have 17, failed.")
 		t.Fail()
 	}
