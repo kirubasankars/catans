@@ -31,7 +31,7 @@ type Intersection struct {
 	y     float64
 	r     float64
 
-	port *HexagonPort
+	port *Hexagon
 
 	nodes     []*Hexagon
 	neighbors []*Intersection
@@ -64,7 +64,7 @@ func (grid *Grid) makeGrid(h int, w int, tileConfig []string, tokens []int) {
 			if len(tc) == 3 {
 				d, _ := strconv.Atoi(string(tc[2]))
 				n.port = &HexagonPort{direction: float64(d), resource: string(tc[1])}
-				n.terrain = "-"
+				n.terrain = string(tc[1])
 			}
 
 			if !(n.terrain == "d" || n.terrain == "-" || n.terrain == "s" || n.port != nil) { //ignore any thing is not tokens
@@ -107,7 +107,7 @@ func (grid *Grid) makeIntersections() {
 		if node.terrain == "-" || node.terrain == "s" || node.port != nil {
 			continue
 		}
-		var neighbors []*Hexagon
+		//var neighbors []*Hexagon
 
 		for i := 0.0; i < 6; i++ {
 			x := node.x + r*math.Cos((a*i)+11)
@@ -135,7 +135,7 @@ func (grid *Grid) makeIntersections() {
 			}
 
 			ins.nodes = nodes
-			neighbors = append(neighbors, nodes...)
+			//neighbors = append(neighbors, nodes...)
 			//node.intersections = append(node.intersections, ins)
 		}
 
@@ -170,14 +170,14 @@ func (grid *Grid) makeIntersections() {
 			var px = node.x + r*math.Cos((a*node.port.direction)+11)
 			var py = node.y + r*math.Sin((a*node.port.direction)+11)
 			if grid.circlesIntersect(ins.x, ins.y, ins.r, px, py, ins.r) {
-				ins.port = node.port
+				ins.port = node
 			}
 
 			var ns = getNextSide(node.port.direction)
 			px = node.x + r*math.Cos((a*ns)+11)
 			py = node.y + r*math.Sin((a*ns)+11)
 			if grid.circlesIntersect(ins.x, ins.y, ins.r, px, py, ins.r) {
-				ins.port = node.port
+				ins.port = node
 			}
 		}
 	}

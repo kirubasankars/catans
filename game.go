@@ -63,30 +63,30 @@ func (game *Game) UI() string {
 			continue
 		}
 		if h.port != nil {
-			nodes = append(nodes, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"rs":"%s","port":true,"direction":%.0f}`, h.index, h.x, h.y, h.r, convertCardTypeToTerrain(tiles[idx][0]), h.port.direction))
+			nodes = append(nodes, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"terrain":"%s","port":{"direction":%.0f,"resource":"%s"}}`, h.index, h.x, h.y, h.r, convertCardTypeToTerrain(tiles[idx][0]), h.port.direction, convertCardTypeToTerrain(tiles[idx][0])))
 		} else {
-			nodes = append(nodes, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"rs":"%s","t":%d}`, h.index, h.x, h.y, h.r, convertCardTypeToTerrain(tiles[idx][0]), tiles[idx][1]))
+			nodes = append(nodes, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"terrain":"%s","token":%d}`, h.index, h.x, h.y, h.r, convertCardTypeToTerrain(tiles[idx][0]), tiles[idx][1]))
 		}
 
 	}
+
 	var intersections []string
 	for _, ins := range board.grid.intersections {
-		if ins.port != nil {
-			var rs = ""
-			var p *Hexagon
-			for _, n := range ins.nodes {
-				if n.port != nil {
-					rs = convertCardTypeToTerrain(tiles[n.index][0])
-					p = n
-					break
-				}
+		var nodes []string
+		for _, n := range ins.nodes {
+			if n.terrain == "-" || n.terrain == "s" || n.port != nil {
+				continue
 			}
-			intersections = append(intersections, fmt.Sprintf(`{"id":%d,"x":%0.2f,"y":%.2f,"r":%.0f,"hasport":%t,"port":{"rs":"%s","x":%.2f,"y":%.2f,"r":%.0f}}`, ins.index, ins.x, ins.y, ins.r, ins.port != nil, rs, p.x, p.y, p.r))
+			nodes = append(nodes, fmt.Sprintf(`%d`, n.index))
+		}
+		if ins.port != nil {
+			intersections = append(intersections, fmt.Sprintf(`{"id":%d,"x":%0.2f,"y":%.2f,"r":%.0f,"port":{"resource":"%s","x":%.2f,"y":%.2f,"r":%.0f},"hexagons":[%s]}`, ins.index, ins.x, ins.y, ins.r, convertCardTypeToTerrain(tiles[ins.port.index][0]), ins.port.x, ins.port.y, ins.port.r, strings.Join(nodes,",")))
 		} else {
-			intersections = append(intersections, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"hasport":%t}`, ins.index, ins.x, ins.y, ins.r, ins.port != nil))
+			intersections = append(intersections, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"hexagons":[%s]}`, ins.index, ins.x, ins.y, ins.r, strings.Join(nodes,",")))
 		}
 	}
-	return "{'nodes': [" + strings.Join(nodes, ",") + "], 'intersections':[" + strings.Join(intersections, ",") + "]}"
+
+	return `{"hexagons": [` + strings.Join(nodes, ",") + `], "intersections":[` + strings.Join(intersections, ",") + `]}`
 }
 
 func (game Game) BankTrade(gives [][2]int, wants [][2]int) error {

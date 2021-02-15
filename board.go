@@ -71,7 +71,17 @@ func (board Board) GetTiles() [][2]int {
 			rt = 3
 		case "m":
 			rt = 4
+		case "l":
+			rt = 0
+		case "b":
+			rt = 1
+		case "w":
+			rt = 2
 		case "g":
+			rt = 3
+		case "o":
+			rt = 4
+		case "?":
 			rt = 5
 		case "-":
 			rt = -1
@@ -113,7 +123,7 @@ func convertCardTypeToTerrain(cardType int) string {
 	case 4:
 		return "m"
 	case 5:
-		return "g"
+		return "?"
 	case -1:
 		return "-"
 	case -2:
