@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"thayam/utils"
 	"time"
 )
 
@@ -65,7 +66,7 @@ func (context *GameContext) putSettlement(validate bool, intersection int) error
 		banker.Begin()
 		for _, card := range cards {
 			currentPlayer.Cards[card[0]] -= card[1]
-			if err := banker.Take(card[0], card[1]); err != nil {
+			if err := banker.Set(card[0], card[1]); err != nil {
 				banker.Rollback()
 				return err
 			}
@@ -112,7 +113,7 @@ func (context *GameContext) upgradeSettlement(intersection int) error {
 		context.Bank.Begin()
 		for _, card := range cards {
 			currentPlayer.Cards[card[0]] -= card[1]
-			err := context.Bank.Take(card[0], card[1])
+			err := context.Bank.Set(card[0], card[1])
 			if err != nil {
 				return err
 			}
@@ -136,7 +137,7 @@ func (context *GameContext) buyDevelopmentCard() error {
 
 		for _, card := range cards {
 			currentPlayer.Cards[card[0]] -= card[1]
-			err := context.Bank.Take(card[0], card[1])
+			err := context.Bank.Set(card[0], card[1])
 			if err != nil {
 				return err
 			}
@@ -346,7 +347,7 @@ func (context *GameContext) putRoad(validate bool, road [2]int) error {
 		banker.Begin()
 		for _, card := range cards {
 			currentPlayer.Cards[card[0]] -= card[1]
-			if err := banker.Take(card[0], card[1]); err != nil {
+			if err := banker.Set(card[0], card[1]); err != nil {
 				banker.Rollback()
 				return err
 			}
@@ -427,22 +428,22 @@ func (context *GameContext) bankTrade(gives, wants [][2]int) error {
 
 		if currentPlayer.ownPort21 || currentPlayer.ownPort31 {
 			if currentPlayer.ownPort21 && currentPlayer.ports21[giveCardType] == 1 && giveTradeCount == 2 {
-				if err := banker.Take(giveCardType, giveTradeCount); err != nil {
+				if err := banker.Set(giveCardType, giveTradeCount); err != nil {
 					banker.Rollback()
 					return err
 				}
-				if _, err := banker.Give(wantCardType, wantTradeCount); err != nil {
+				if _, err := banker.Get(wantCardType, wantTradeCount); err != nil {
 					banker.Rollback()
 					return err
 				}
 				currentPlayer.Cards[giveCardType] = -2
 				currentPlayer.Cards[wantCardType]++
 			} else if currentPlayer.ownPort31 && giveTradeCount == 3 {
-				if err := banker.Take(giveCardType, giveTradeCount); err != nil {
+				if err := banker.Set(giveCardType, giveTradeCount); err != nil {
 					banker.Rollback()
 					return err
 				}
-				if _, err := banker.Give(wantCardType, wantTradeCount); err != nil {
+				if _, err := banker.Get(wantCardType, wantTradeCount); err != nil {
 					banker.Rollback()
 					return err
 				}
@@ -451,11 +452,11 @@ func (context *GameContext) bankTrade(gives, wants [][2]int) error {
 			}
 		} else {
 			if giveTradeCount == 4 {
-				if err := banker.Take(giveCardType, giveTradeCount); err != nil {
+				if err := banker.Set(giveCardType, giveTradeCount); err != nil {
 					banker.Rollback()
 					return err
 				}
-				if _, err := banker.Give(wantCardType, wantTradeCount); err != nil {
+				if _, err := banker.Get(wantCardType, wantTradeCount); err != nil {
 					banker.Rollback()
 					return err
 				}
@@ -802,9 +803,9 @@ func (context *GameContext) handleDice(dice int) error {
 					var count = 0
 					var err error = nil
 					if settlement.Upgraded {
-						count, err = context.Bank.Give(terrain, 2)
+						count, err = context.Bank.Get(terrain, 2)
 					} else {
-						count, err = context.Bank.Give(terrain, 1)
+						count, err = context.Bank.Get(terrain, 1)
 					}
 					if err != nil {
 						bank.Rollback()
@@ -941,8 +942,7 @@ func (context *GameContext) randomPlaceRobber() {
 	}
 	ins := rand.Intn(len(occupiedIns))
 	tileIndices := context.board.GetTileIndices(ins)
-	context.RobberPlacement = tileIndices[0]
-	context.scheduleAction(ActionSelectToSteal)
+	context.placeRobber(tileIndices[0])
 }
 
 func (context *GameContext) randomSelectPlayerToSteal() {
@@ -963,9 +963,34 @@ func (context *GameContext) randomSelectPlayerToSteal() {
 	}
 }
 
-func (context *GameContext) stealAPlayer(playerID int) {
+func (context *GameContext) placeRobber(tileID int) error {
+	if context.Action.Name != ActionPlaceRobber {
+		return errors.New(ErrInvalidOperation)
+	}
+	context.RobberPlacement = tileID
+	context.scheduleAction(ActionSelectToSteal)
+	return nil
+}
+
+func (context *GameContext) stealAPlayer(otherPlayerID int) error {
+	if context.Action.Name != ActionSelectToSteal {
+		return errors.New(ErrInvalidOperation)
+	}
 	currentPlayer := context.getCurrentPlayer()
-	otherPlayer := context.Players[playerID]
+	otherPlayer := context.Players[otherPlayerID]
+
+	// if other player don't have settlement on that tile, throw.
+	hasSettlement := false
+	for _, s := range otherPlayer.Settlements {
+		if _, ok := utils.Contains(s.Indices, context.RobberPlacement); ok {
+			hasSettlement = true
+		}
+	}
+	if !hasSettlement {
+		return errors.New(ErrInvalidOperation)
+	}
+	// if other player don't have settlement on that tile, throw.
+
 	var availableCards []int
 	for idx, card := range otherPlayer.Cards {
 		if card == 0 {
@@ -980,6 +1005,8 @@ func (context *GameContext) stealAPlayer(playerID int) {
 		otherPlayer.Cards[randCardType] -= 1
 		currentPlayer.Cards[randCardType] += 1
 	}
+	context.scheduleAction(ActionTurn)
+	return nil
 }
 
 func (context *GameContext) playMonopoly(cardType int) error {
@@ -1013,13 +1040,29 @@ func (context *GameContext) playMonopoly(cardType int) error {
 }
 
 func (context *GameContext) play2Resource(cards [2]int) error {
+	if context.phase != Phase4 {
+		return errors.New(ErrInvalidOperation)
+	}
 	currentPlayer := context.getCurrentPlayer()
+
+	hasPlay2Resource := false
+	for idx, devCard := range currentPlayer.DevCards {
+		if devCard == DevCard2Resource {
+			hasPlay2Resource = true
+			currentPlayer.DevCards = Remove(currentPlayer.DevCards, idx)
+			break
+		}
+	}
+
+	if !hasPlay2Resource {
+		return errors.New(ErrInvalidOperation)
+	}
 
 	banker := context.Bank
 	banker.Begin()
 
 	for _, cardType := range cards {
-		if _, err := banker.Give(cardType, 1); err != nil {
+		if _, err := banker.Get(cardType, 1); err != nil {
 			banker.Rollback()
 			return err
 		}
@@ -1032,7 +1075,24 @@ func (context *GameContext) play2Resource(cards [2]int) error {
 }
 
 func (context *GameContext) play2Road(roads [][2]int) error {
+	if context.phase != Phase4 {
+		return errors.New(ErrInvalidOperation)
+	}
 	currentPlayer := context.getCurrentPlayer()
+
+	hasPlay2Road := false
+	for idx, devCard := range currentPlayer.DevCards {
+		if devCard == DevCard2Road {
+			hasPlay2Road = true
+			currentPlayer.DevCards = Remove(currentPlayer.DevCards, idx)
+			break
+		}
+	}
+
+	if !hasPlay2Road {
+		return errors.New(ErrInvalidOperation)
+	}
+
 	for _, road := range roads {
 		if road[0] > road[1] {
 			s := road[1]
@@ -1049,6 +1109,28 @@ func (context *GameContext) play2Road(roads [][2]int) error {
 	return nil
 }
 
+func (context *GameContext) playKnight(tileID, playerID int) error {
+	if context.phase != Phase4 {
+		return errors.New(ErrInvalidOperation)
+	}
+	currentPlayer := context.getCurrentPlayer()
+
+	hasPlayKnight := false
+	for idx, devCard := range currentPlayer.DevCards {
+		if devCard == DevCardKnight {
+			hasPlayKnight = true
+			currentPlayer.DevCards = Remove(currentPlayer.DevCards, idx)
+			break
+		}
+	}
+	if !hasPlayKnight {
+		return errors.New(ErrInvalidOperation)
+	}
+
+	context.RobberPlacement = tileID
+	return context.stealAPlayer(playerID)
+}
+
 func (context *GameContext) giveInitialFreeCards() error {
 	context.Bank.Begin()
 	for _, player := range context.Players {
@@ -1056,11 +1138,11 @@ func (context *GameContext) giveInitialFreeCards() error {
 		indices := player.Settlements[r].Indices
 		fmt.Println(indices)
 		cardType := context.Tiles[indices[0]][0]
-		context.Bank.Give(cardType, 1)
+		context.Bank.Get(cardType, 1)
 		player.Cards[cardType]++
 		if len(indices) > 1 {
 			cardType := context.Tiles[indices[1]][0]
-			context.Bank.Give(cardType, 1)
+			context.Bank.Get(cardType, 1)
 			player.Cards[cardType]++
 		}
 	}

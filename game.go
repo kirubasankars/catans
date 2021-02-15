@@ -79,10 +79,14 @@ func (game *Game) UI() string {
 			}
 			nodes = append(nodes, fmt.Sprintf(`%d`, n.index))
 		}
+		var neighbors []string
+		for _, n := range ins.neighbors {
+			neighbors = append(neighbors, fmt.Sprintf(`%d`, n.index))
+		}
 		if ins.port != nil {
-			intersections = append(intersections, fmt.Sprintf(`{"id":%d,"x":%0.2f,"y":%.2f,"r":%.0f,"port":{"resource":"%s","x":%.2f,"y":%.2f,"r":%.0f},"hexagons":[%s]}`, ins.index, ins.x, ins.y, ins.r, convertCardTypeToTerrain(tiles[ins.port.index][0]), ins.port.x, ins.port.y, ins.port.r, strings.Join(nodes,",")))
+			intersections = append(intersections, fmt.Sprintf(`{"id":%d,"x":%0.2f,"y":%.2f,"r":%.0f,"port":{"resource":"%s","x":%.2f,"y":%.2f,"r":%.0f},"hexagons":[%s],"neighbors":[%s]}`, ins.index, ins.x, ins.y, ins.r, convertCardTypeToTerrain(tiles[ins.port.index][0]), ins.port.x, ins.port.y, ins.port.r, strings.Join(nodes,","), strings.Join(neighbors,",")))
 		} else {
-			intersections = append(intersections, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"hexagons":[%s]}`, ins.index, ins.x, ins.y, ins.r, strings.Join(nodes,",")))
+			intersections = append(intersections, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"hexagons":[%s],"neighbors":[%s]}`, ins.index, ins.x, ins.y, ins.r, strings.Join(nodes,","), strings.Join(neighbors,",")))
 		}
 	}
 
@@ -139,6 +143,14 @@ func (game Game) UpgradeSettlement(intersection int) error {
 
 func (game Game) BuyDevelopmentCard() error {
 	return game.context.buyDevelopmentCard()
+}
+
+func (game Game) PlaceRobber(tileID int) {
+	game.context.placeRobber(tileID)
+}
+
+func (game Game) StealAPlayer(playerID int)  {
+	game.context.stealAPlayer(playerID)
 }
 
 func (game *Game) run() {

@@ -11,34 +11,27 @@ type Bank struct {
 	// 2 - wool
 	// 3 - grain
 	// 4 - ore
-
-	// 0 - tree
-	// 1 - hill
-	// 2 - pasture
-	// 3 - field
-	// 4 - mountain
 	cards    [5]int
 	devCards []int
 
 	devCardIndex int
-	t            *Bank
+	t            [5]int
 }
 
 func (bank *Bank) Begin() {
-	bank.t = &Bank{}
-	bank.t.cards = bank.cards
+	bank.t = bank.cards
 }
 
 func (bank *Bank) Commit() {
-	bank.t = nil
+	bank.t = [5]int{}
 }
 
 func (bank *Bank) Rollback() {
-	bank.cards = bank.t.cards
-	bank.t = nil
+	bank.cards = bank.t
+	bank.t = [5]int{}
 }
 
-func (bank *Bank) Give(cardType int, count int) (int, error) {
+func (bank *Bank) Get(cardType int, count int) (int, error) {
 	if bank.cards[cardType] == 0 {
 		return 0, errors.New("not enough cards")
 	}
@@ -53,7 +46,7 @@ func (bank *Bank) Give(cardType int, count int) (int, error) {
 	return count, nil
 }
 
-func (bank *Bank) Take(cardType int, count int) error {
+func (bank *Bank) Set(cardType int, count int) error {
 	if bank.cards[cardType]+count > 19 {
 		return errors.New(ErrInvalidOperation)
 	}
