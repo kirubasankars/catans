@@ -8,9 +8,8 @@ func (board Board) GetNeighborIntersections1(intersection int) []int {
 	thisIntersection := board.grid.intersections[intersection]
 	neighborIntersections := thisIntersection.neighbors
 	var output = make([]int, len(thisIntersection.neighbors))
-	for _, ins := range neighborIntersections {
-		t := ins.index
-		output = append(output, t)
+	for idx, ins := range neighborIntersections {
+		output[idx] = ins.index
 	}
 	return output
 }
@@ -38,7 +37,7 @@ func (board Board) GetAvailableIntersections(occupied []int) []int {
 			occupied = append(occupied, nins.index)
 		}
 	}
-	keys := make([]int, 0, len(intersections))
+	keys := make([]int, 0, len(intersections) - len(occupied))
 	for k := range intersections {
 		if !Contains(occupied, k) {
 			keys = append(keys, k)
