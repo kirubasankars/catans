@@ -65,7 +65,7 @@ func (game *Game) UI() string {
 		terrain := convertCardTypeToTerrain(tiles[idx][0])
 		token := tiles[idx][1]
 		if h.port != nil {
-			nodes = append(nodes, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"terrain":"%s","port":{"direction":%.0f,"resource":"%d"}}`, h.index, h.x, h.y, h.r, terrain, h.port.direction, terrain))
+			nodes = append(nodes, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"terrain":"%s","port":{"direction":%.0f,"resource":"%s"}}`, h.index, h.x, h.y, h.r, terrain, h.port.direction, terrain))
 		} else {
 			nodes = append(nodes, fmt.Sprintf(`{"id":%d,"x":%.2f,"y":%.2f,"r":%.0f,"terrain":"%s","token":%d}`, h.index, h.x, h.y, h.r, terrain, token))
 		}
