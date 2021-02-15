@@ -1054,6 +1054,7 @@ func (context *GameContext) giveInitialFreeCards() error {
 	for _, player := range context.Players {
 		r := rand.Intn(2)
 		indices := player.Settlements[r].Indices
+		fmt.Println(indices)
 		cardType := context.Tiles[indices[0]][0]
 		context.Bank.Give(cardType, 1)
 		player.Cards[cardType]++

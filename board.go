@@ -48,9 +48,12 @@ func (board Board) GetAvailableIntersections(occupied []int) []int {
 
 func (board Board) GetTileIndices(intersection int) []int {
 	coordinator := board.grid.intersections[intersection]
-	var indices = make([]int, len(coordinator.nodes))
-	for idx, n := range coordinator.nodes {
-		indices[idx] = n.index
+	var indices []int
+	for _, n := range coordinator.nodes {
+		if n.port != nil {
+			continue
+		}
+		indices =  append(indices, n.index)
 	}
 	return indices
 }
