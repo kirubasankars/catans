@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestBoardGetAvailableIntersections(t *testing.T) {
+func TestDefaultBoardGetAvailableIntersections(t *testing.T) {
 	board := NewBoard(0)
 	intersections := board.GetAvailableIntersections([]int{})
 
@@ -64,7 +64,7 @@ func TestBoardGetAvailableIntersections(t *testing.T) {
 	}
 }
 
-func TestBoardGetNeighborIntersections1(t *testing.T) {
+func TestDefaultBoardGetNeighborIntersections1(t *testing.T) {
 	board := NewBoard(0)
 
 	neighbors := board.GetNeighborIntersections1(20)
@@ -109,7 +109,7 @@ func TestBoardGetNeighborIntersections1(t *testing.T) {
 
 }
 
-func TestBoardGetNeighborIntersections2(t *testing.T) {
+func TestDefaultBoardGetNeighborIntersections2(t *testing.T) {
 	board := NewBoard(0)
 
 	output := board.GetNeighborIntersections2(20)
@@ -158,7 +158,7 @@ func TestBoardGetNeighborIntersections2(t *testing.T) {
 	}
 }
 
-func TestGetTileIndices(t *testing.T) {
+func TestDefaultGetTileIndices(t *testing.T) {
 	board := NewBoard(0)
 
 	indices := board.GetTileIndices(21)
