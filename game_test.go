@@ -14,7 +14,7 @@ func TestGameRollDiceAndCards(t *testing.T) {
 	gs.TurnTimeOut = false
 	game.UpdateGameSetting(gs)
 	game.Start()
-	fmt.Println(game.UI())
+	//fmt.Println(game.UI())
 	availableIntersections := game.context.board.GetAvailableIntersections([]int{})
 	if len(availableIntersections) != 54 {
 		t.Log("expected to have 54 intersections, failed.")

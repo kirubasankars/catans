@@ -15,7 +15,7 @@ func TestBankGet(t *testing.T) {
 
 func TestBankSet(t *testing.T) {
 	bank := NewBank()
-	bank.cards[0] = 17
+	bank.cards[0] = 18
 	err := bank.Set(0, 1)
 	if err != nil || bank.cards[0] != 19 {
 		t.Log("expected to have 19, failed.")

@@ -3,7 +3,6 @@ package main
 import (
 	"container/list"
 	"errors"
-	"fmt"
 	"math/rand"
 	"time"
 )
@@ -667,7 +666,7 @@ func (context *GameContext) phase3GetNextAction() string {
 }
 
 func (context *GameContext) endAction() error {
-	fmt.Println("END", context.getActionString(), context.CurrentPlayerID)
+	//fmt.Println("END", context.getActionString(), context.CurrentPlayerID)
 
 	if Phase4 == context.phase {
 		//clean up trades
@@ -844,7 +843,7 @@ func (context GameContext) calculateLongestRoad(player Player, otherPlayersSettl
 
 		pending.PushBack(path{intersection: node, length: 0, visited: [][2]int{}})
 
-		fmt.Println("FROM", node)
+		//fmt.Println("FROM", node)
 
 		for pending.Len() > 0 {
 
@@ -886,7 +885,7 @@ func (context GameContext) calculateLongestRoad(player Player, otherPlayersSettl
 			}
 
 			if pathEnd {
-				fmt.Println("Path End", item)
+				//fmt.Println("Path End", item)
 				if longest < item.length {
 					longest = item.length
 				}
@@ -1135,7 +1134,7 @@ func (context *GameContext) giveInitialFreeCards() error {
 	for _, player := range context.Players {
 		r := rand.Intn(2)
 		indices := player.Settlements[r].Indices
-		fmt.Println(indices)
+		//fmt.Println(indices)
 		cardType := context.Tiles[indices[0]][0]
 		context.Bank.Get(cardType, 1)
 		player.Cards[cardType]++

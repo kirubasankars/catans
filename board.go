@@ -18,11 +18,11 @@ func (board Board) GetNeighborIntersections2(intersection int) [][2]int {
 	thisIntersection := board.grid.intersections[intersection]
 	neighborIntersections := thisIntersection.neighbors
 	var output = make([][2]int, len(thisIntersection.neighbors))
-	for _, ins := range neighborIntersections {
+	for idx, ins := range neighborIntersections {
 		if ins.index < intersection {
-			output = append(output, [2]int{ins.index, intersection})
+			output[idx] = [2]int{ins.index, intersection}
 		} else {
-			output = append(output, [2]int{intersection, ins.index})
+			output[idx] = [2]int{intersection, ins.index}
 		}
 	}
 	return output
