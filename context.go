@@ -371,7 +371,7 @@ func (context *GameContext) handOverCards(player *Player, cardType int, count in
 }
 
 func (context *GameContext) updateGameSetting(gs GameSetting) error {
-	if context.GameState.phase != Phase1 || gs.NumberOfPlayers <= 1 || gs.Map < 0 || gs.Map >= 1 {
+	if context.GameState.phase != Phase1 || gs.NumberOfPlayers <= 1 || gs.Map < 0 || gs.Map > 1 {
 		return errors.New(ErrInvalidOperation)
 	}
 	if context.GameSetting.DiscardCardLimit < 7 {

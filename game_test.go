@@ -39,7 +39,6 @@ func TestGameRollDiceAndCards(t *testing.T) {
 	}
 	game.PutSettlement(26)
 
-
 	availableRoads = game.context.board.GetNeighborIntersections1(26)
 	if len(availableRoads) != 3 {
 		t.Log("expected to have 54 intersections, failed.")
@@ -314,6 +313,13 @@ func TestPlayMonopoly(t *testing.T) {
 	}
 }
 
-func TestAvailableRoads(t *testing.T) {
-
+func TestGameSmallMap(t *testing.T) {
+	game := NewGame()
+	gs := *new(GameSetting)
+	gs.Map = 1
+	gs.NumberOfPlayers = 2
+	gs.TurnTimeOut = false
+	game.UpdateGameSetting(gs)
+	game.Start()
+	fmt.Println(game.UI())
 }

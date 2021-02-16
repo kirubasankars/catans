@@ -5,12 +5,12 @@ type SmallMap struct {
 
 func (smallMap SmallMap) GetTileConfig() string {
 	return `
--,s,s?2,s,so2,-
-s?0,t,p,m,s,-
-s,h,t,m,f,sb3
-sl0,h,p,f,s,-
--,s,sw1,s,sg2,-
-	`
+-,s,s?2,s,so3,-
+s?1,t,p,m,s,-
+s,h,t,m,f,sb4
+sl1,h,p,f,s,-
+-,s,sw0,s,sg5,-
+`
 }
 
 func (smallMap SmallMap) GetChits() []int {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -19,7 +20,7 @@ func TestBoardGetAvailableIntersections(t *testing.T) {
 	}
 
 	intersections = board.GetAvailableIntersections([]int{2})
-	if len(intersections) != 50{
+	if len(intersections) != 50 {
 		t.Log("expected to have 50, failed")
 		t.Fail()
 	}
@@ -116,7 +117,7 @@ func TestBoardGetNeighborIntersections2(t *testing.T) {
 		t.Log("expected to have 3 values, failed")
 		t.Fail()
 	}
-	matched  := 0
+	matched := 0
 	for _, neighbors := range output {
 		if neighbors[0] == 13 || neighbors[1] == 13 {
 			matched++
@@ -139,7 +140,7 @@ func TestBoardGetNeighborIntersections2(t *testing.T) {
 		t.Fail()
 	}
 
-	matched  = 0
+	matched = 0
 	for _, neighbors := range output {
 		if neighbors[0] == 29 || neighbors[1] == 29 {
 			matched++
@@ -179,4 +180,9 @@ func TestGetTileIndices(t *testing.T) {
 		t.Log("expected to have 33, failed")
 		t.Fail()
 	}
+}
+
+func TestSmallMapBoard(t *testing.T) {
+	board := NewBoard(1)
+	fmt.Println(board)
 }

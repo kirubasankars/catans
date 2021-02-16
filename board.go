@@ -138,4 +138,3 @@ func NewBoard(ID int) Board {
 	board.grid = grid
 	return *board
 }
-
