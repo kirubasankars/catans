@@ -1,5 +1,8 @@
 window.onload = function () {
-    $.get('board.json', function (output) {
+    $.get('/ui', function (output) {
+
+        output = JSON.parse(output)
+
         console.log(output)
         var printerFriendly = true
 
