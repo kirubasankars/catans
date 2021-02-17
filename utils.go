@@ -19,7 +19,14 @@ func Unique(s []int) []int {
 	return ns
 }
 
-func Remove(s []int, i int) []int {
-	s[len(s)-1], s[i] = s[i], s[len(s)-1]
-	return s[:len(s)-1]
+func Remove(s []int, e int) []int {
+	var value = make([]int, len(s)-1)
+	i := 0
+	for idx, v := range s {
+		if idx != e {
+			value[i] = v
+			i++
+		}
+	}
+	return value
 }
