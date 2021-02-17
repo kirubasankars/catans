@@ -10,18 +10,22 @@ func (context *GameContext) buyDevelopmentCard() error {
 			return errors.New(ErrInvalidOperation)
 		}
 
-		context.Bank.Begin()
+		bank := context.Bank
+		bank.Begin()
+
+		card, err := context.Bank.BuyDevCard()
+		if err != nil {
+			bank.Rollback()
+			return err
+		}
 
 		for _, card := range cards {
 			currentPlayer.Cards[card[0]] -= card[1]
 			err := context.Bank.Set(card[0], card[1])
 			if err != nil {
+				bank.Rollback()
 				return err
 			}
-		}
-		card, err := context.Bank.BuyDevCard()
-		if err != nil {
-			return err
 		}
 
 		currentPlayer.DevCards = append(currentPlayer.DevCards, card)

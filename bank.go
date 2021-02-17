@@ -15,20 +15,25 @@ type Bank struct {
 	devCards []int
 
 	devCardIndex int
-	t            [5]int
+	t            *Bank
 }
 
 func (bank *Bank) Begin() {
-	bank.t = bank.cards
+	bank.t = &Bank{}
+	bank.t.cards = bank.cards
+	bank.t.devCards = bank.devCards
+	bank.t.devCardIndex = bank.devCardIndex
 }
 
 func (bank *Bank) Commit() {
-	bank.t = [5]int{}
+	bank.t = nil
 }
 
 func (bank *Bank) Rollback() {
-	bank.cards = bank.t
-	bank.t = [5]int{}
+	bank.cards = bank.t.cards
+	bank.devCardIndex = bank.t.devCardIndex
+	bank.devCards = bank.t.devCards
+	bank.t = nil
 }
 
 func (bank *Bank) Get(cardType int, count int) (int, error) {

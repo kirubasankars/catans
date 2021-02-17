@@ -10,12 +10,10 @@ func Contains(s []int, e int) bool {
 }
 
 func Unique(s []int) []int {
-	var ns = make([]int, len(s))
-	i := 0
+	var ns []int
 	for _, a := range s {
 		if !Contains(ns, a) {
-			ns[i] = a
-			i++
+			ns = append(ns, a)
 		}
 	}
 	return ns

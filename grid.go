@@ -195,7 +195,12 @@ func (grid *Grid) makeIntersections() {
 		ins1.neighbors = neighbors
 	}
 
-	grid.intersections = intersections
+	var tintersections = make([]*Intersection, len(intersections))
+	for _, ins := range intersections {
+		tintersections[ins.index] = ins
+	}
+
+	grid.intersections = tintersections
 }
 
 func (grid *Grid) circlesIntersect(x1, y1, r1, x2, y2, r2 float64) bool {

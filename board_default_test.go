@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -180,9 +179,4 @@ func TestDefaultGetTileIndices(t *testing.T) {
 		t.Log("expected to have 33, failed")
 		t.Fail()
 	}
-}
-
-func TestSmallMapBoard(t *testing.T) {
-	board := NewBoard(1)
-	fmt.Println(board)
 }
