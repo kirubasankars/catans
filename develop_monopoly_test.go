@@ -1,3 +1,6 @@
+package main
+
+import "testing"
 
 func TestPlayMonopoly(t *testing.T) {
 	game := NewGame()
