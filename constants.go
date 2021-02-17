@@ -24,3 +24,9 @@ const DevCardVPPoint = 1
 const DevCardMonopoly = 2
 const DevCard2Resource = 3
 const DevCard2Road = 4
+
+const CardLumber = 0
+const CardBrick = 1
+const CardWool = 2
+const CardGrain = 3
+const CardOre = 4
