@@ -25,7 +25,7 @@ type Player struct {
 
 	ownPort31 bool
 	ownPort21 bool
-	ports21   [5]byte
+	ports21   [5]int
 }
 
 func (player Player) stat() {

@@ -1,5 +1,5 @@
 window.onload = function () {
-    $.get('/ui', function (output) {
+    $.get('/board_ui?g=GAME-1', function (output) {
 
         output = JSON.parse(output)
 

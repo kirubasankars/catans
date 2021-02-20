@@ -1,0 +1,70 @@
+POST /create_game
+output
+    {"ok"true}
+
+
+PUT  /update_settings
+input
+    {
+        "map":"",
+        "number_of_players":""
+    }
+output
+    {"ok"true}
+
+PUT  /start_game
+input
+     {
+         "game":""
+     }
+output
+    {"ok"true, "events":[{"id":0,"name":""}]}
+
+GET  /board_ui
+     {
+         "game":""
+     }
+
+PUT  /put_settlement
+input
+     {
+         "game":"",
+         "intersection":0
+     }
+output
+    {"ok"true, "events":[{"id","name":""}]}
+
+PUT  /put_road
+input
+     {
+         "game":"",
+         "road": [0,0]
+     }
+output
+    {"ok"true, "events":[{"id","name":""}]}
+
+GET  /roll_dice
+    {
+        "game":"",
+    }
+output
+    {"ok"true, "events":[{"id","name":""}]}
+
+GET  /curent_player
+input
+    {
+        "game":"",
+    }
+
+output
+    int
+
+GET  /game_state
+input
+     {
+         "game":""
+     }
+output
+    {
+        "game" : ""        
+    }

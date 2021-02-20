@@ -117,10 +117,10 @@ func (context *GameContext) completeTrade(tradeID int) error {
 	return nil
 }
 
-func (context *GameContext) bankTrade(gives, wants [][2]int) error {
-	if context.phase == Phase4 && len(gives) == 1 && len(wants) == 1 && wants[0][1] == 1 && gives[0][1] > 1 {
+func (context *GameContext) bankTrade(gives [2]int, wants int) error {
+	if context.phase == Phase4 {
 		currentPlayer := context.getCurrentPlayer()
-		if !context.isSafeTrade(gives, wants) || !context.isPlayerHasAllCards(currentPlayer.ID, gives) {
+		if !context.isPlayerHasAllCards(currentPlayer.ID, [][2]int{gives}) {
 			return errors.New(ErrInvalidOperation)
 		}
 
@@ -128,10 +128,10 @@ func (context *GameContext) bankTrade(gives, wants [][2]int) error {
 		banker.Begin()
 		defer banker.Commit()
 
-		wantCardType := wants[0][0]
-		wantTradeCount := wants[0][1]
-		giveCardType := gives[0][0]
-		giveTradeCount := gives[0][1]
+		wantCardType := wants
+		wantTradeCount := 1
+		giveCardType := gives[0]
+		giveTradeCount := gives[1]
 
 		if currentPlayer.ownPort21 || currentPlayer.ownPort31 {
 			if currentPlayer.ownPort21 && currentPlayer.ports21[giveCardType] == 1 && giveTradeCount == 2 {

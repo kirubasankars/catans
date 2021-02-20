@@ -37,12 +37,8 @@ func (bank *Bank) Rollback() {
 }
 
 func (bank *Bank) Get(cardType int, count int) (int, error) {
-	if bank.cards[cardType] == 0 {
-		return 0, errors.New("not enough cards")
-	}
-
 	r := bank.cards[cardType] - count
-	if r < 0 {
+	if r <= 0 {
 		return -1, errors.New("not enough cards")
 	}
 

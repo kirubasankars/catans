@@ -205,7 +205,7 @@ func (context GameContext) isPlayerHasAllCards(playerID int, cards [][2]int) boo
 	for _, giveCard := range cards {
 		giveCardType := giveCard[0]
 		giveTradeCount := giveCard[1]
-		if giveTradeCount <= 0 || player.Cards[giveCardType] <= giveTradeCount {
+		if giveTradeCount <= 0 || player.Cards[giveCardType] < giveTradeCount {
 			return false
 		}
 	}

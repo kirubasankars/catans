@@ -5,7 +5,7 @@ import "errors"
 func (context *GameContext) buyDevelopmentCard() error {
 	currentPlayer := context.getCurrentPlayer()
 	if Phase4 == context.phase {
-		cards := [][2]int{{2, 1}, {3, 1}, {4, 1}}
+		cards := [][2]int{{CardWool, 1}, {CardGrain, 1}, {CardOre, 1}}
 		if !context.isPlayerHasAllCards(currentPlayer.ID, cards) {
 			return errors.New(ErrInvalidOperation)
 		}
@@ -13,7 +13,7 @@ func (context *GameContext) buyDevelopmentCard() error {
 		bank := context.Bank
 		bank.Begin()
 
-		card, err := context.Bank.BuyDevCard()
+		card, err := bank.BuyDevCard()
 		if err != nil {
 			bank.Rollback()
 			return err
@@ -21,7 +21,7 @@ func (context *GameContext) buyDevelopmentCard() error {
 
 		for _, card := range cards {
 			currentPlayer.Cards[card[0]] -= card[1]
-			err := context.Bank.Set(card[0], card[1])
+			err := bank.Set(card[0], card[1])
 			if err != nil {
 				bank.Rollback()
 				return err
@@ -30,7 +30,7 @@ func (context *GameContext) buyDevelopmentCard() error {
 
 		currentPlayer.DevCards = append(currentPlayer.DevCards, card)
 
-		context.Bank.Commit()
+		bank.Commit()
 	}
 	return errors.New(ErrInvalidOperation)
 }
