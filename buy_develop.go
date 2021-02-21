@@ -31,6 +31,7 @@ func (context *GameContext) buyDevelopmentCard() error {
 		currentPlayer.DevCards = append(currentPlayer.DevCards, card)
 
 		bank.Commit()
+		return nil
 	}
 	return errors.New(ErrInvalidOperation)
 }

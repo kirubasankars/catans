@@ -24,6 +24,17 @@ func TestBuyDevelopmentCard(t *testing.T) {
 
 	err := game.BuyDevelopmentCard()
 	if err != nil {
+		t.Log("expected not have error, failed")
+		t.FailNow()
+	}
 
+	if len(game.getPlayer(game.CurrentPlayer()).DevCards) < 0 {
+		t.Log("expected not have dev card, failed")
+		t.Fail()
+	}
+
+	if game.context.Bank.devCardIndex != 24 {
+		t.Log("expected not have dev card, failed")
+		t.Fail()
 	}
 }
