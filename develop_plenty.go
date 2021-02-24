@@ -9,10 +9,11 @@ func (context *GameContext) playPlenty(cards [2]int) error {
 	currentPlayer := context.getCurrentPlayer()
 
 	hasPlay2Resource := false
+	devCardIndex := 0
 	for idx, devCard := range currentPlayer.DevCards {
 		if devCard == DevCard2Resource {
 			hasPlay2Resource = true
-			currentPlayer.DevCards = Remove(currentPlayer.DevCards, idx)
+			devCardIndex = idx
 			break
 		}
 	}
@@ -29,7 +30,13 @@ func (context *GameContext) playPlenty(cards [2]int) error {
 			banker.Rollback()
 			return err
 		}
-		currentPlayer.Cards[cardType]++
+	}
+
+	currentPlayer.Cards[cards[0]]++
+	currentPlayer.Cards[cards[1]]++
+
+	if hasPlay2Resource {
+		currentPlayer.DevCards = Remove(currentPlayer.DevCards, devCardIndex)
 	}
 
 	banker.Commit()

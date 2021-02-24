@@ -8,21 +8,21 @@ func (context *GameContext) randomDiscardCards() {
 			numberOfCardsRemove := cardCount / 2
 
 			for {
-				cardId := rand.Intn(5)
-				card := player.Cards[cardId]
-				if card == 0 {
+				cardType := rand.Intn(5)
+				cardCount := player.Cards[cardType]
+				if cardCount == 0 {
 					if numberOfCardsRemove <= 0 {
 						break
 					}
 					continue
 				}
 
-				r := rand.Intn(card) + 1
-				if numberOfCardsRemove-r >= 0 {
-					player.Cards[cardId] = card - r
-					numberOfCardsRemove -= r
+				randCardCount2Remove := rand.Intn(cardCount) + 1
+				if numberOfCardsRemove-randCardCount2Remove >= 0 {
+					player.Cards[cardType] = cardCount - randCardCount2Remove
+					numberOfCardsRemove -= randCardCount2Remove
 				} else {
-					player.Cards[cardId] = card - numberOfCardsRemove
+					player.Cards[cardType] = cardCount - numberOfCardsRemove
 					numberOfCardsRemove = 0
 				}
 
