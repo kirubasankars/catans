@@ -99,6 +99,8 @@ func (context *GameContext) putSettlement(validate bool, intersection int) error
 	settlement = Settlement{Indices: tileIndices, Tokens: tokens, Intersection: intersection}
 	currentPlayer.Settlements = append(currentPlayer.Settlements, settlement)
 
+	currentPlayer.CalculateScore()
+
 	if Phase2 == context.phase || Phase3 == context.phase {
 		return context.endAction()
 	}
@@ -125,16 +127,20 @@ func (context *GameContext) upgradeSettlement(intersection int) error {
 			return errors.New(ErrInvalidOperation)
 		}
 
-		settlement.Upgraded = true
-		context.Bank.Begin()
+		bank := context.Bank
+		bank.Begin()
 		for _, card := range cards {
 			currentPlayer.Cards[card[0]] -= card[1]
-			err := context.Bank.Set(card[0], card[1])
+			err := bank.Set(card[0], card[1])
 			if err != nil {
+				bank.Rollback()
 				return err
 			}
 		}
-		context.Bank.Commit()
+		bank.Commit()
+
+		settlement.Upgraded = true
+		currentPlayer.CalculateScore()
 
 		return nil
 	}

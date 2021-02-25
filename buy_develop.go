@@ -29,6 +29,9 @@ func (context *GameContext) buyDevelopmentCard() error {
 		}
 
 		currentPlayer.DevCards = append(currentPlayer.DevCards, card)
+		if card == DevCardVPPoint {
+			currentPlayer.CalculateScore()
+		}
 
 		bank.Commit()
 		return nil

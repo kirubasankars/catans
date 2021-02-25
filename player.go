@@ -25,22 +25,23 @@ type Player struct {
 	hasLongestRoad  bool
 	KnightUsedCount int
 
+	score     int
 	ownPort31 bool
 	ownPort21 bool
 	ports21   [5]int
 }
 
-func (player Player) CalculateScore() int {
+func (player Player) CalculateScore() {
 	score := 0
 	for _, settlement := range player.Settlements {
-		score += 1
+		score++
 		if settlement.Upgraded {
-			score += 1
+			score++
 		}
 	}
 	for _, devCard := range player.DevCards {
 		if devCard == 1 {
-			score += 1
+			score++
 		}
 	}
 	if player.hasLargestArmy {
@@ -49,7 +50,7 @@ func (player Player) CalculateScore() int {
 	if player.hasLongestRoad {
 		score += 2
 	}
-	return score
+	player.score = score
 }
 
 type path struct {
