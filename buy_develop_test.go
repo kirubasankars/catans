@@ -37,8 +37,8 @@ func TestBuyDevelopmentCard(t *testing.T) {
 		t.FailNow()
 	}
 
-	if len(game.getPlayer(game.CurrentPlayer()).DevCards) < 0 {
-		t.Log("expected not have dev card, failed")
+	if len(game.getPlayer(game.CurrentPlayer()).DevCards) <= 0 {
+		t.Log("expected to have dev card, failed")
 		t.Fail()
 	}
 

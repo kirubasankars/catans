@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strings"
 )
 
 type Player struct {
@@ -18,23 +17,38 @@ type Player struct {
 	// 2 - pasture
 	// 3 - field
 	// 4 - mountain
-	Cards       [5]int
-	Roads       [][2]int
-	Settlements []Settlement
-	DevCards    []int
+	Cards          [5]int
+	Roads          [][2]int
+	Settlements    []Settlement
+	DevCards       []int
+	hasLargestArmy bool
+	hasLongestRoad bool
 
 	ownPort31 bool
 	ownPort21 bool
 	ports21   [5]int
 }
 
-func (player Player) stat() {
-	var lines []string
-	for idx, count := range player.Cards {
-		name := convertCardTypeToTerrain(idx)
-		lines = append(lines, fmt.Sprintf("%s:%d", name, count))
+func (player Player) CalculateScore() int {
+	score := 0
+	for _, settlement := range player.Settlements {
+		score += 1
+		if settlement.Upgraded {
+			score += 1
+		}
 	}
-	fmt.Println(player.ID, strings.Join(lines, ", "))
+	for _, devCard := range player.DevCards {
+		if devCard == 1 {
+			score += 1
+		}
+	}
+	if player.hasLargestArmy {
+		score += 2
+	}
+	if player.hasLongestRoad {
+		score += 2
+	}
+	return score
 }
 
 type path struct {
