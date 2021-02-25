@@ -160,14 +160,3 @@ func TestGameRollDiceAndCards(t *testing.T) {
 
 	fmt.Println("")
 }
-
-func TestGameSmallMap(t *testing.T) {
-	game := NewGame()
-	gs := *new(GameSetting)
-	gs.Map = 1
-	gs.NumberOfPlayers = 2
-	gs.TurnTimeOut = false
-	game.UpdateGameSetting(gs)
-	game.Start()
-	//fmt.Println(game.UI())
-}

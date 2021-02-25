@@ -3,7 +3,21 @@ package main
 import "container/list"
 
 func (context GameContext) calculateLongestRoad(player Player, otherPlayersSettlements []int) int {
-	roadNodes := player.uniqueRoadNodes()
+
+	uniqueRoads := func() []int {
+		var nodes []int
+		for _, road := range player.Roads {
+			if !Contains(nodes, road[0]) {
+				nodes = append(nodes, road[0])
+			}
+			if !Contains(nodes, road[1]) {
+				nodes = append(nodes, road[1])
+			}
+		}
+		return nodes
+	}
+
+	roadNodes := uniqueRoads()
 	pending := list.New()
 	longest := 0
 
@@ -64,3 +78,8 @@ func (context GameContext) calculateLongestRoad(player Player, otherPlayersSettl
 	return longest
 }
 
+type path struct {
+	intersection int
+	visited      [][2]int
+	length       int
+}

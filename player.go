@@ -1,9 +1,5 @@
 package main
 
-import (
-	"fmt"
-)
-
 type Player struct {
 	ID int
 	// 0 - lumber
@@ -51,29 +47,6 @@ func (player Player) CalculateScore() {
 		score += 2
 	}
 	player.score = score
-}
-
-type path struct {
-	intersection int
-	visited      [][2]int
-	length       int
-}
-
-func (player Player) uniqueRoadNodes() []int {
-	var nodes []int
-	for _, road := range player.Roads {
-		if !Contains(nodes, road[0]) {
-			nodes = append(nodes, road[0])
-		}
-		if !Contains(nodes, road[1]) {
-			nodes = append(nodes, road[1])
-		}
-	}
-	return nodes
-}
-
-func (player Player) String() string {
-	return fmt.Sprintf("Player %d", player.ID)
 }
 
 func (player Player) hasMoreCardsThen(limit int) (bool, int) {

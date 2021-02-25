@@ -1,6 +1,9 @@
 package main
 
-import "errors"
+import (
+	"errors"
+	"math/rand"
+)
 
 func (context *GameContext) getPossibleRoads() ([][2]int, error) {
 
@@ -159,4 +162,10 @@ func (context *GameContext) putRoad(validate bool, road [2]int) error {
 		return context.endAction()
 	}
 	return nil
+}
+
+func (context *GameContext) randomPlaceInitialRoad() error {
+	availableRoads, _ := context.getPossibleRoads()
+	selectedRoad := availableRoads[rand.Intn(len(availableRoads))]
+	return context.putRoad(false, selectedRoad)
 }

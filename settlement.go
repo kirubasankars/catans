@@ -1,6 +1,9 @@
 package main
 
-import "errors"
+import (
+	"errors"
+	"math/rand"
+)
 
 func (context *GameContext) getPossibleSettlementLocations() ([]int, error) {
 	if Phase4 == context.phase {
@@ -145,4 +148,10 @@ func (context *GameContext) upgradeSettlement(intersection int) error {
 		return nil
 	}
 	return errors.New(ErrInvalidOperation)
+}
+
+func (context *GameContext) randomPlaceInitialSettlement() error {
+	availableIntersections, _ := context.getPossibleSettlementLocations()
+	selectedIntersection := availableIntersections[rand.Intn(len(availableIntersections))]
+	return context.putSettlement(false, selectedIntersection)
 }
