@@ -5,7 +5,7 @@ import (
 	"math/rand"
 )
 
-func (context *GameContext) playKnight(tileID, playerID int) error {
+func (context *GameContext) playKnight() error {
 	if context.phase != Phase4 {
 		return errors.New(ErrInvalidOperation)
 	}
@@ -23,8 +23,21 @@ func (context *GameContext) playKnight(tileID, playerID int) error {
 		return errors.New(ErrInvalidOperation)
 	}
 
-	context.RobberPlacement = tileID
-	return context.stealAPlayer(playerID)
+	currentPlayer.KnightUsedCount++
+
+	for _, player := range context.Players {
+		if player.ID == context.CurrentPlayerID {
+			continue
+		}
+
+		if currentPlayer.KnightUsedCount >= 3 && currentPlayer.KnightUsedCount > player.KnightUsedCount {
+			currentPlayer.hasLargestArmy = true
+		}
+	}
+
+	context.scheduleAction(ActionPlaceRobber)
+
+	return nil
 }
 
 func (context *GameContext) placeRobber(tileID int) error {
@@ -40,6 +53,7 @@ func (context *GameContext) stealAPlayer(otherPlayerID int) error {
 	if context.Action.Name != ActionSelectToSteal {
 		return errors.New(ErrInvalidOperation)
 	}
+
 	currentPlayer := context.getCurrentPlayer()
 	otherPlayer := context.Players[otherPlayerID]
 
@@ -53,22 +67,62 @@ func (context *GameContext) stealAPlayer(otherPlayerID int) error {
 	if !hasSettlement {
 		return errors.New(ErrInvalidOperation)
 	}
-	// if other player don't have settlement on that tile, throw.
 
-	var availableCards []int
+	var availableCardTypes []int
 	for idx, card := range otherPlayer.Cards {
 		if card == 0 {
 			continue
 		}
-		availableCards = append(availableCards, idx)
+		availableCardTypes = append(availableCardTypes, idx)
 	}
-	l := len(availableCards)
+
+	l := len(availableCardTypes)
 	if l > 0 {
 		r := rand.Intn(l)
-		randCardType := availableCards[r]
-		otherPlayer.Cards[randCardType] -= 1
-		currentPlayer.Cards[randCardType] += 1
+		randCardType := availableCardTypes[r]
+		otherPlayer.Cards[randCardType]--
+		currentPlayer.Cards[randCardType]++
 	}
+
 	context.scheduleAction(ActionTurn)
+
 	return nil
+}
+
+func (context *GameContext) randomPlaceRobber() {
+	var occupiedIns []int
+	for _, player := range context.Players {
+		if player.ID == context.CurrentPlayerID {
+			continue
+		}
+		for _, settlement := range player.Settlements {
+			occupiedIns = append(occupiedIns, settlement.Intersection)
+		}
+	}
+	ins := rand.Intn(len(occupiedIns))
+	tileIndices := context.board.GetTileIndices(ins)
+	context.placeRobber(tileIndices[0])
+}
+
+func (context *GameContext) randomSelectPlayerToSteal() {
+	var playerToRob = -1
+	for _, player := range context.Players {
+		if player.ID == context.CurrentPlayerID {
+			continue
+		}
+		for _, settlement := range player.Settlements {
+			for _, tileIndex := range settlement.Indices {
+				if tileIndex == context.RobberPlacement {
+					playerToRob = player.ID
+				}
+			}
+		}
+	}
+
+	if playerToRob == -1 {
+		context.scheduleAction(ActionTurn)
+		return
+	}
+
+	context.stealAPlayer(playerToRob)
 }

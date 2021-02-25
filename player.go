@@ -17,12 +17,13 @@ type Player struct {
 	// 2 - pasture
 	// 3 - field
 	// 4 - mountain
-	Cards          [5]int
-	Roads          [][2]int
-	Settlements    []Settlement
-	DevCards       []int
-	hasLargestArmy bool
-	hasLongestRoad bool
+	Cards           [5]int
+	Roads           [][2]int
+	Settlements     []Settlement
+	DevCards        []int
+	hasLargestArmy  bool
+	hasLongestRoad  bool
+	KnightUsedCount int
 
 	ownPort31 bool
 	ownPort21 bool
