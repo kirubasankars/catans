@@ -2,6 +2,7 @@ package main
 
 
 func (context *GameContext) handleDice(dice int) error {
+	context.EventRolled(dice)
 	if dice == 7 {
 		for _, player := range context.Players {
 			if yes, _ := player.hasMoreCardsThen(context.DiscardCardLimit); yes {
@@ -50,6 +51,7 @@ func (context *GameContext) handleDice(dice int) error {
 		player := context.Players[card[0]]
 		cardType := card[1]
 		player.Cards[cardType] = player.Cards[cardType] + card[2]
+		context.EventCardDistributed(player.ID, cardType, card[2])
 	}
 
 	return nil

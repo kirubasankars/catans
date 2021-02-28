@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"github.com/gorilla/websocket"
 	"time"
 )
 
@@ -12,6 +13,8 @@ type GameContext struct {
 
 	GameSetting
 	GameState
+
+	Users        []*User
 }
 
 func (context GameContext) getCurrentPlayer() *Player {
@@ -31,6 +34,8 @@ func (context *GameContext) updateGameSetting(gs GameSetting) error {
 		player.ID = i
 		context.Players = append(context.Players, player)
 	}
+	//TODO: safe resizing
+	//context.Users = make([]*User, gs.NumberOfPlayers)
 	context.board = NewBoard(gs.Map)
 	context.Tiles = context.board.GetTiles()
 	return nil
@@ -212,10 +217,22 @@ func (context GameContext) isPlayerHasAllCards(playerID int, cards [][2]int) boo
 	return true
 }
 
+func (context GameContext) publishMessage() {
+	for _, user := range context.Users {
+		if user.Status == 0 {
+			continue
+		}
+		user.LastPublishedEventID = context.EventID
+		user.con.SetWriteDeadline(time.Now().Add(writeWait))
+		user.con.WriteMessage(websocket.TextMessage, []byte(context.Events[context.EventID]))
+	}
+}
+
 func NewGameContext() *GameContext {
 	gc := new(GameContext)
 	gc.phase = Phase1
 	gc.Bank = NewBank()
+	gc.Users = []*User{}
 	return gc
 }
 

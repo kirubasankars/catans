@@ -101,6 +101,7 @@ func (context *GameContext) putSettlement(validate bool, intersection int) error
 	}
 	settlement = Settlement{Indices: tileIndices, Tokens: tokens, Intersection: intersection}
 	currentPlayer.Settlements = append(currentPlayer.Settlements, settlement)
+	context.EventPutSettlement(intersection)
 
 	currentPlayer.CalculateScore()
 

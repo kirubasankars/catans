@@ -54,7 +54,7 @@ func (game *Game) RollDice() error {
 	return game.context.handleDice(sum)
 }
 
-func (game *Game) UI() string {
+func (game *Game) Board() string {
 	board := game.context.board
 	tiles := game.context.Tiles
 	var nodes []string

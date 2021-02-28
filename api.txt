@@ -59,12 +59,3 @@ input
 output
     int
 
-GET  /game_state
-input
-     {
-         "game":""
-     }
-output
-    {
-        "game" : ""        
-    }

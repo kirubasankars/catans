@@ -32,7 +32,7 @@ func (context *GameContext) buyDevelopmentCard() error {
 		if card == DevCardVPPoint {
 			currentPlayer.CalculateScore()
 		}
-
+		context.EventBoughtDevelopmentCard()
 		bank.Commit()
 		return nil
 	}

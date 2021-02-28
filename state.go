@@ -3,6 +3,8 @@ package main
 type GameState struct {
 	phase           string
 	Action          GameAction
+	EventID         int
+	Events          []string
 	Bank            *Bank
 	CurrentPlayerID int
 	Players         []*Player
