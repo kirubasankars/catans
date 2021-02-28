@@ -13,14 +13,14 @@ type Player struct {
 	// 2 - pasture
 	// 3 - field
 	// 4 - mountain
-	Cards           [5]int
-	Roads           [][2]int
-	Settlements     []Settlement
-	DevCards        []int
-	hasLargestArmy  bool
-	hasLongestRoad  bool
-	KnightUsedCount int
-	RoadsCount      int
+	Cards            [5]int
+	Roads            [][2]int
+	Settlements      []Settlement
+	DevCards         []int
+	hasLargestArmy   bool
+	hasLongestRoad   bool
+	KnightUsedCount  int
+	LongestRoadCount int
 
 	score     int
 	ownPort31 bool
@@ -28,7 +28,7 @@ type Player struct {
 	ports21   [5]int
 }
 
-func (player Player) CalculateScore() {
+func (player Player) calculateScore() {
 	score := 0
 	for _, settlement := range player.Settlements {
 		score++
@@ -56,6 +56,22 @@ func (player Player) hasMoreCardsThen(limit int) (bool, int) {
 		cardCount += card
 	}
 	return cardCount > limit, cardCount
+}
+
+func (player Player) updateLongestRoad(context GameContext) {
+	if len(player.Roads) > 4 {
+		player.LongestRoadCount = context.calculateLongestRoad(player, []int{})
+		for _, otherPlayer := range context.Players {
+			if otherPlayer.ID == context.CurrentPlayerID {
+				continue
+			}
+
+			if player.LongestRoadCount > otherPlayer.LongestRoadCount {
+				player.hasLongestRoad = true
+				player.calculateScore()
+			}
+		}
+	}
 }
 
 func NewPlayer() *Player {

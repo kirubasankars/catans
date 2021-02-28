@@ -197,6 +197,14 @@ func (game *Game) run() {
 		{
 			context.randomSelectPlayerToSteal()
 		}
+	case ActionDevPlaceRoad1:
+		{
+			context.randomPlaceDev2PlaceRoad()
+		}
+	case ActionDevPlaceRoad2:
+		{
+			context.randomPlaceDev2PlaceRoad()
+		}
 	}
 }
 

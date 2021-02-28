@@ -19,7 +19,7 @@ func (context *GameContext) giveInitialFreeCards() error {
 		if len(indices) > 1 {
 			giveCard(1)
 		}
-		if len(indices) >= 2 {
+		if len(indices) > 2 {
 			giveCard(2)
 		}
 	}

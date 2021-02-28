@@ -103,7 +103,7 @@ func (context *GameContext) putSettlement(validate bool, intersection int) error
 	currentPlayer.Settlements = append(currentPlayer.Settlements, settlement)
 	context.EventPutSettlement(intersection)
 
-	currentPlayer.CalculateScore()
+	currentPlayer.calculateScore()
 
 	if Phase2 == context.phase || Phase3 == context.phase {
 		return context.endAction()
@@ -144,7 +144,7 @@ func (context *GameContext) upgradeSettlement(intersection int) error {
 		bank.Commit()
 
 		settlement.Upgraded = true
-		currentPlayer.CalculateScore()
+		currentPlayer.calculateScore()
 
 		return nil
 	}

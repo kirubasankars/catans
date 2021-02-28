@@ -51,31 +51,16 @@ func (context *GameContext) playDev2PlaceRoad(road [2]int) error {
 	currentPlayer := context.getCurrentPlayer()
 	currentPlayer.Roads = append(currentPlayer.Roads, road)
 
-	updateLongestRoad := func() {
-		if currentPlayer.RoadsCount > 4 {
-			for _, otherPlayer := range context.Players {
-				if otherPlayer.ID == context.CurrentPlayerID {
-					continue
-				}
-
-				if currentPlayer.RoadsCount > otherPlayer.RoadsCount {
-					currentPlayer.hasLongestRoad = true
-					currentPlayer.CalculateScore()
-				}
-			}
-		}
-	}
-
-	currentPlayer.RoadsCount++
-	updateLongestRoad()
+	currentPlayer.updateLongestRoad(*context)
 
 	if context.Action.Name == ActionDevPlaceRoad1 {
 		availableRoads, _ := context.getPossibleRoads()
 		if len(availableRoads) == 0 {
+
 			currentPlayer.Roads = currentPlayer.Roads[:len(currentPlayer.Roads)-1]
 			currentPlayer.DevCards = append(currentPlayer.DevCards, DevCard2Road)
-			currentPlayer.RoadsCount--
-			updateLongestRoad()
+			currentPlayer.updateLongestRoad(*context)
+
 			context.scheduleAction(ActionTurn)
 			return errors.New(ErrInvalidOperation)
 		}
@@ -89,8 +74,9 @@ func (context *GameContext) playDev2PlaceRoad(road [2]int) error {
 	return nil
 }
 
-func (context *GameContext) randomPlaceDev2PlaceRoad() {
+func (context *GameContext) randomPlaceDev2PlaceRoad() error {
 	availableRoads, _ := context.getPossibleRoads()
 	selectedRoad := availableRoads[rand.Intn(len(availableRoads))]
 	context.playDev2PlaceRoad(selectedRoad)
+	return nil
 }

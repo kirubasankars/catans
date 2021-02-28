@@ -33,7 +33,7 @@ func (context *GameContext) playKnight() error {
 
 			if currentPlayer.KnightUsedCount > otherPlayer.KnightUsedCount {
 				currentPlayer.hasLargestArmy = true
-				currentPlayer.CalculateScore()
+				currentPlayer.calculateScore()
 			}
 		}
 	}
