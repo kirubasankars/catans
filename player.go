@@ -20,6 +20,7 @@ type Player struct {
 	hasLargestArmy  bool
 	hasLongestRoad  bool
 	KnightUsedCount int
+	RoadsCount      int
 
 	score     int
 	ownPort31 bool

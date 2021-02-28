@@ -26,12 +26,12 @@ func (context *GameContext) playKnight() error {
 	currentPlayer.KnightUsedCount++
 
 	if currentPlayer.KnightUsedCount >= 3 {
-		for _, player := range context.Players {
-			if player.ID == context.CurrentPlayerID {
+		for _, otherPlayer := range context.Players {
+			if otherPlayer.ID == context.CurrentPlayerID {
 				continue
 			}
 
-			if currentPlayer.KnightUsedCount > player.KnightUsedCount {
+			if currentPlayer.KnightUsedCount > otherPlayer.KnightUsedCount {
 				currentPlayer.hasLargestArmy = true
 				currentPlayer.CalculateScore()
 			}

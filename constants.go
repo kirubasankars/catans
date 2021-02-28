@@ -15,10 +15,11 @@ const ActionDiscardCards = "DISCARD_CARDS"
 const ActionPlaceRobber = "PLACE_ROBBER"
 const ActionSelectToSteal = "SELECT_TO_ROB"
 const ActionRollDice = "ROLL_DICE"
+const ActionDevPlaceRoad1 = "PLACE_ROAD1"
+const ActionDevPlaceRoad2 = "PLACE_ROAD2"
 const ActionTurn = "TURN"
 
 //Development Cards
-
 const DevCardKnight = 0
 const DevCardVPPoint = 1
 const DevCardMonopoly = 2

@@ -150,6 +150,7 @@ func (context *GameContext) putRoad(validate bool, road [2]int) error {
 		}
 		banker.Commit()
 		currentPlayer.Roads = append(currentPlayer.Roads, road)
+		currentPlayer.RoadsCount ++
 		context.EventPutRoad(road)
 
 		return nil
@@ -161,6 +162,7 @@ func (context *GameContext) putRoad(validate bool, road [2]int) error {
 		}
 		currentPlayer := context.getCurrentPlayer()
 		currentPlayer.Roads = append(currentPlayer.Roads, road)
+		currentPlayer.RoadsCount ++
 		context.EventPutRoad(road)
 		return context.endAction()
 	}
