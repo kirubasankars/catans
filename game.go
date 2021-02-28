@@ -100,7 +100,7 @@ func (game Game) BankTrade(gives [2]int, wants int) error {
 	return game.context.bankTrade(gives, wants)
 }
 
-func (game Game) SetupTrade(gives [][2]int, wants [][2]int) error {
+func (game Game) SetupTrade(gives [][2]int, wants [][2]int) ([][2]int, error) {
 	return game.context.setupTrade(gives, wants)
 }
 

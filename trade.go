@@ -21,11 +21,13 @@ func (context *GameContext) getTrade(tradeID int) *GameTrade {
 	return nil
 }
 
-func (context *GameContext) setupTrade(gives [][2]int, wants [][2]int) error {
+func (context *GameContext) setupTrade(gives [][2]int, wants [][2]int) ([][2]int, error) {
 	currentPlayer := context.getCurrentPlayer()
-	if !context.isSafeTrade(gives, wants) || !context.isPlayerHasAllCards(currentPlayer.ID, gives) {
-		return errors.New(ErrInvalidOperation)
+	if !(context.isSafeTrade(gives, wants) || context.isPlayerHasAllCards(currentPlayer.ID, gives)) {
+		return nil, errors.New(ErrInvalidOperation)
 	}
+
+	var trades [][2]int
 
 	for _, otherPlayer := range context.Players {
 		if otherPlayer.ID != currentPlayer.ID {
@@ -44,13 +46,14 @@ func (context *GameContext) setupTrade(gives [][2]int, wants [][2]int) error {
 			trade.HasAllCards = hasAllCards
 			trade.OK = 0
 			context.trades = append(context.trades, trade)
+			trades = append(trades, [2]int{otherPlayer.ID, trade.ID})
 
 			//race condition
 			context.tradeCounter++
 		}
 	}
 
-	return nil
+	return trades, nil
 }
 
 func (context *GameContext) overrideTrade(playerID, tradeID int, gives [][2]int, wants [][2]int) error {
