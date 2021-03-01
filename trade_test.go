@@ -2,7 +2,7 @@ package main
 
 import "testing"
 
-func TestGameTrade(t *testing.T) {
+func TestGameTrade1(t *testing.T) {
 	game := NewGame()
 	gs := *new(GameSetting)
 	gs.Map = 0
@@ -37,8 +37,8 @@ func TestGameTrade(t *testing.T) {
 		t.Log("expected to have 5 wool cards, failed")
 		t.Fail()
 	}
-
 }
+
 
 func TestGameTradeAcceptAndReject(t *testing.T) {
 	game := NewGame()

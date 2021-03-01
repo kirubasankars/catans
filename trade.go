@@ -121,61 +121,61 @@ func (context *GameContext) completeTrade(tradeID int) error {
 }
 
 func (context *GameContext) bankTrade(gives [2]int, wants int) error {
-	if context.phase == Phase4 {
-		currentPlayer := context.getCurrentPlayer()
-		if !context.isPlayerHasAllCards(currentPlayer.ID, [][2]int{gives}) {
-			return errors.New(ErrInvalidOperation)
-		}
-
-		banker := context.Bank
-		banker.Begin()
-		defer banker.Commit()
-
-		wantCardType := wants
-		wantTradeCount := 1
-		giveCardType := gives[0]
-		giveTradeCount := gives[1]
-
-		if currentPlayer.ownPort21 || currentPlayer.ownPort31 {
-			if currentPlayer.ownPort21 && currentPlayer.ports21[giveCardType] == 1 && giveTradeCount == 2 {
-				if err := banker.Set(giveCardType, giveTradeCount); err != nil {
-					banker.Rollback()
-					return err
-				}
-				if _, err := banker.Get(wantCardType, wantTradeCount); err != nil {
-					banker.Rollback()
-					return err
-				}
-				currentPlayer.Cards[giveCardType] = -2
-				currentPlayer.Cards[wantCardType]++
-			} else if currentPlayer.ownPort31 && giveTradeCount == 3 {
-				if err := banker.Set(giveCardType, giveTradeCount); err != nil {
-					banker.Rollback()
-					return err
-				}
-				if _, err := banker.Get(wantCardType, wantTradeCount); err != nil {
-					banker.Rollback()
-					return err
-				}
-				currentPlayer.Cards[giveCardType] = -3
-				currentPlayer.Cards[wantCardType]++
-			}
-		} else {
-			if giveTradeCount == 4 {
-				if err := banker.Set(giveCardType, giveTradeCount); err != nil {
-					banker.Rollback()
-					return err
-				}
-				if _, err := banker.Get(wantCardType, wantTradeCount); err != nil {
-					banker.Rollback()
-					return err
-				}
-				currentPlayer.Cards[giveCardType] = -4
-				currentPlayer.Cards[wantCardType]++
-			}
-		}
-
+	if context.phase != Phase4 {
+		return errors.New(ErrInvalidOperation)
 	}
 
-	return errors.New(ErrInvalidOperation)
+	currentPlayer := context.getCurrentPlayer()
+	if context.isPlayerHasAllCards(currentPlayer.ID, [][2]int{gives}) {
+		return errors.New(ErrInvalidOperation)
+	}
+
+	banker := context.Bank
+	banker.Begin()
+	defer banker.Commit()
+
+	wantCardType := wants
+	wantTradeCount := 1
+	giveCardType := gives[0]
+	giveTradeCount := gives[1]
+
+	if currentPlayer.ownPort21 || currentPlayer.ownPort31 {
+		if currentPlayer.ownPort21 && currentPlayer.ports21[giveCardType] == 1 && giveTradeCount == 2 {
+			if err := banker.Set(giveCardType, giveTradeCount); err != nil {
+				banker.Rollback()
+				return err
+			}
+			if _, err := banker.Get(wantCardType, wantTradeCount); err != nil {
+				banker.Rollback()
+				return err
+			}
+			currentPlayer.Cards[giveCardType] = -2
+			currentPlayer.Cards[wantCardType]++
+		} else if currentPlayer.ownPort31 && giveTradeCount == 3 {
+			if err := banker.Set(giveCardType, giveTradeCount); err != nil {
+				banker.Rollback()
+				return err
+			}
+			if _, err := banker.Get(wantCardType, wantTradeCount); err != nil {
+				banker.Rollback()
+				return err
+			}
+			currentPlayer.Cards[giveCardType] = -3
+			currentPlayer.Cards[wantCardType]++
+		}
+	} else {
+		if giveTradeCount == 4 {
+			if err := banker.Set(giveCardType, giveTradeCount); err != nil {
+				banker.Rollback()
+				return err
+			}
+			if _, err := banker.Get(wantCardType, wantTradeCount); err != nil {
+				banker.Rollback()
+				return err
+			}
+			currentPlayer.Cards[giveCardType] = -4
+			currentPlayer.Cards[wantCardType]++
+		}
+	}
+	return nil
 }
