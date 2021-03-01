@@ -9,7 +9,7 @@ func TestGameTrade1(t *testing.T) {
 	gs.NumberOfPlayers = 2
 	game.UpdateGameSetting(gs)
 	game.Start()
-
+	game.context.phase = Phase4
 	game.context.Players[0].Cards = [5]int{2, 4, 5, 5, 6}
 	game.context.Players[1].Cards = [5]int{4, 2, 6, 7, 8}
 
@@ -39,7 +39,6 @@ func TestGameTrade1(t *testing.T) {
 	}
 }
 
-
 func TestGameTradeAcceptAndReject(t *testing.T) {
 	game := NewGame()
 	gs := *new(GameSetting)
@@ -47,7 +46,7 @@ func TestGameTradeAcceptAndReject(t *testing.T) {
 	gs.NumberOfPlayers = 3
 	game.UpdateGameSetting(gs)
 	game.Start()
-
+	game.context.phase = Phase4
 	game.context.Players[0].Cards = [5]int{2, 4, 5, 5, 6}
 	game.context.Players[1].Cards = [5]int{4, 2, 6, 7, 8}
 
@@ -68,6 +67,38 @@ func TestGameTradeAcceptAndReject(t *testing.T) {
 	trade = game.context.getTrade(rejectedTradeID)
 	if trade.OK != -1 {
 		t.Log("expected to be rejected, failed")
+		t.Fail()
+	}
+}
+
+func TestGameBankTrade(t *testing.T) {
+	game := NewGame()
+	gs := *new(GameSetting)
+	gs.Map = 0
+	gs.NumberOfPlayers = 2
+	game.UpdateGameSetting(gs)
+	game.Start()
+	game.context.phase = Phase4
+	game.context.Players[0].Cards = [5]int{0, 4, 5, 0, 0}
+
+	game.context.Bank.Get(CardBrick, 4)
+	game.context.Bank.Get(CardWool, 5)
+
+	game.BankTrade([2]int{CardBrick,4}, CardWool)
+	if game.context.Players[0].Cards[CardWool] != 6 {
+		t.Log("expected to have 6 wool cards, failed")
+		t.Fail()
+	}
+	game.context.Players[0].ownPort31 = true
+	game.BankTrade([2]int{CardWool,3}, CardLumber)
+
+	if game.context.Players[0].Cards[CardWool] != 3 {
+		t.Log("expected to have 2 wool cards, failed")
+		t.Fail()
+	}
+
+	if game.context.Players[0].Cards[CardLumber] != 1 {
+		t.Log("expected to have 1 lumber card, failed")
 		t.Fail()
 	}
 }

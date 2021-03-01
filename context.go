@@ -190,16 +190,31 @@ func (context GameContext) isSafeTrade(gives [][2]int, wants [][2]int) bool {
 	if context.phase != Phase4 {
 		return false
 	}
-	gl := len(gives)
-	wl := len(wants)
-	if gl == 0 || wl == 0 || wl > 5 || gl > 5 {
+
+	glen := len(gives)
+	wlen := len(wants)
+	if glen == 0 || wlen == 0 || wlen > 5 || glen > 5 {
 		return false
 	}
-	c := 0
+
+	wcount := 0
 	for _, w := range wants {
-		c += w[1]
+		wcount += w[1]
+		for _, g := range gives {
+			if w[0] == g[0] {
+				return false // same card type can't be traded.
+			}
+		}
 	}
-	if c > 4 { // not allowed to trade more then 3 cards
+	if wcount > 4 { // not allowed to trade more then 3 cards
+		return false
+	}
+
+	gcount := 0
+	for _, c := range gives {
+		gcount += c[1]
+	}
+	if gcount > 4 { // not allowed to trade more then 3 cards
 		return false
 	}
 	return true

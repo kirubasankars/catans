@@ -72,5 +72,4 @@ func TestBuyDevelopmentCardError(t *testing.T) {
 		t.Log("expected to have err, failed")
 		t.Fail()
 	}
-	t.Log(err)
 }

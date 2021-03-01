@@ -57,6 +57,10 @@ func (context *GameContext) setupTrade(gives [][2]int, wants [][2]int) ([][2]int
 }
 
 func (context *GameContext) overrideTrade(playerID, tradeID int, gives [][2]int, wants [][2]int) error {
+	if context.phase != Phase4 {
+		return errors.New(ErrInvalidOperation)
+	}
+
 	var trade = context.getTrade(tradeID)
 	if trade == nil || !context.isSafeTrade(gives, wants) || playerID != trade.To || !context.isPlayerHasAllCards(trade.To, gives) {
 		return errors.New(ErrInvalidOperation)
@@ -79,6 +83,9 @@ func (context *GameContext) overrideTrade(playerID, tradeID int, gives [][2]int,
 }
 
 func (context *GameContext) acceptTrade(playerID, tradeID int) error {
+	if context.phase != Phase4 {
+		return errors.New(ErrInvalidOperation)
+	}
 	trade := context.getTrade(tradeID)
 	if trade == nil || trade.OK != 0 || playerID != trade.To {
 		return errors.New(ErrInvalidOperation)
@@ -88,6 +95,9 @@ func (context *GameContext) acceptTrade(playerID, tradeID int) error {
 }
 
 func (context *GameContext) rejectTrade(playerID, tradeID int) error {
+	if context.phase != Phase4 {
+		return errors.New(ErrInvalidOperation)
+	}
 	trade := context.getTrade(tradeID)
 	if trade == nil || trade.OK != 0 || playerID != trade.To {
 		return errors.New(ErrInvalidOperation)
@@ -97,6 +107,9 @@ func (context *GameContext) rejectTrade(playerID, tradeID int) error {
 }
 
 func (context *GameContext) completeTrade(tradeID int) error {
+	if context.phase != Phase4 {
+		return errors.New(ErrInvalidOperation)
+	}
 	trade := context.getTrade(tradeID)
 	if trade == nil || trade.OK != 1 {
 		return errors.New(ErrInvalidOperation)
@@ -121,12 +134,8 @@ func (context *GameContext) completeTrade(tradeID int) error {
 }
 
 func (context *GameContext) bankTrade(gives [2]int, wants int) error {
-	if context.phase != Phase4 {
-		return errors.New(ErrInvalidOperation)
-	}
-
 	currentPlayer := context.getCurrentPlayer()
-	if context.isPlayerHasAllCards(currentPlayer.ID, [][2]int{gives}) {
+	if !(context.isSafeTrade([][2]int{gives}, [][2]int{{wants, 1}}) || context.isPlayerHasAllCards(currentPlayer.ID, [][2]int{gives})) {
 		return errors.New(ErrInvalidOperation)
 	}
 
@@ -149,7 +158,7 @@ func (context *GameContext) bankTrade(gives [2]int, wants int) error {
 				banker.Rollback()
 				return err
 			}
-			currentPlayer.Cards[giveCardType] = -2
+			currentPlayer.Cards[giveCardType] -= 2
 			currentPlayer.Cards[wantCardType]++
 		} else if currentPlayer.ownPort31 && giveTradeCount == 3 {
 			if err := banker.Set(giveCardType, giveTradeCount); err != nil {
@@ -160,7 +169,7 @@ func (context *GameContext) bankTrade(gives [2]int, wants int) error {
 				banker.Rollback()
 				return err
 			}
-			currentPlayer.Cards[giveCardType] = -3
+			currentPlayer.Cards[giveCardType] -= 3
 			currentPlayer.Cards[wantCardType]++
 		}
 	} else {
@@ -173,7 +182,7 @@ func (context *GameContext) bankTrade(gives [2]int, wants int) error {
 				banker.Rollback()
 				return err
 			}
-			currentPlayer.Cards[giveCardType] = -4
+			currentPlayer.Cards[giveCardType] -= 4
 			currentPlayer.Cards[wantCardType]++
 		}
 	}
