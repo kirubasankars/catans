@@ -6,7 +6,7 @@ func (context GameContext) calculateLongestRoad(player Player, otherPlayersSettl
 
 	uniqueRoads := func() []int {
 		var nodes []int
-		for _, road := range player.Roads {
+		for _, road := range player.roads {
 			if !Contains(nodes, road[0]) {
 				nodes = append(nodes, road[0])
 			}
@@ -36,7 +36,7 @@ func (context GameContext) calculateLongestRoad(player Player, otherPlayersSettl
 
 			item := el.Value.(path)
 
-			for _, road := range player.Roads {
+			for _, road := range player.roads {
 
 				if road[0] == item.intersection || road[1] == item.intersection {
 					////broken road check

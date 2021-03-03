@@ -10,7 +10,7 @@ func (context *GameContext) play2Resource(cards [2]int) error {
 
 	hasPlay2Resource := false
 	devCardIndex := 0
-	for idx, devCard := range currentPlayer.DevCards {
+	for idx, devCard := range currentPlayer.devCards {
 		if devCard == DevCard2Resource {
 			hasPlay2Resource = true
 			devCardIndex = idx
@@ -32,11 +32,11 @@ func (context *GameContext) play2Resource(cards [2]int) error {
 		}
 	}
 
-	currentPlayer.Cards[cards[0]]++
-	currentPlayer.Cards[cards[1]]++
+	currentPlayer.cards[cards[0]]++
+	currentPlayer.cards[cards[1]]++
 
 	if hasPlay2Resource {
-		currentPlayer.DevCards = Remove(currentPlayer.DevCards, devCardIndex)
+		currentPlayer.devCards = Remove(currentPlayer.devCards, devCardIndex)
 	}
 
 	banker.Commit()

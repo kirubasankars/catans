@@ -10,17 +10,18 @@ func (context *GameContext) playRoads() error {
 		return errors.New(ErrInvalidOperation)
 	}
 
+	currentPlayer := context.getCurrentPlayer()
 	availableRoads, _ := context.getPossibleRoads()
-	if len(availableRoads) == 0 {
+	if len(availableRoads) == 0 || currentPlayer.allowedRoadsCount < 1 {
 		return errors.New(ErrInvalidOperation)
 	}
 
-	currentPlayer := context.getCurrentPlayer()
+
 	hasPlay2Road := false
-	for idx, devCard := range currentPlayer.DevCards {
+	for idx, devCard := range currentPlayer.devCards {
 		if devCard == DevCard2Road {
 			hasPlay2Road = true
-			currentPlayer.DevCards = Remove(currentPlayer.DevCards, idx)
+			currentPlayer.devCards = Remove(currentPlayer.devCards, idx)
 			break
 		}
 	}
@@ -49,16 +50,16 @@ func (context *GameContext) playDev2PlaceRoad(road [2]int) error {
 	}
 
 	currentPlayer := context.getCurrentPlayer()
-	currentPlayer.Roads = append(currentPlayer.Roads, road)
-
+	if err := currentPlayer.addRoad(road); err != nil {
+		return err
+	}
 	currentPlayer.updateLongestRoad(*context)
 
 	if context.Action.Name == ActionDevPlaceRoad1 {
 		availableRoads, _ := context.getPossibleRoads()
 		if len(availableRoads) == 0 {
-
-			currentPlayer.Roads = currentPlayer.Roads[:len(currentPlayer.Roads)-1]
-			currentPlayer.DevCards = append(currentPlayer.DevCards, DevCard2Road)
+			currentPlayer.RemoveLastRoad()
+			currentPlayer.devCards = append(currentPlayer.devCards, DevCard2Road)
 			currentPlayer.updateLongestRoad(*context)
 
 			context.scheduleAction(ActionTurn)

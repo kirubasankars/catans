@@ -12,10 +12,10 @@ func (context *GameContext) playKnight() error {
 	currentPlayer := context.getCurrentPlayer()
 
 	hasPlayKnight := false
-	for idx, devCard := range currentPlayer.DevCards {
+	for idx, devCard := range currentPlayer.devCards {
 		if devCard == DevCardKnight {
 			hasPlayKnight = true
-			currentPlayer.DevCards = Remove(currentPlayer.DevCards, idx)
+			currentPlayer.devCards = Remove(currentPlayer.devCards, idx)
 			break
 		}
 	}
@@ -23,15 +23,15 @@ func (context *GameContext) playKnight() error {
 		return errors.New(ErrInvalidOperation)
 	}
 
-	currentPlayer.KnightUsedCount++
+	currentPlayer.knightUsedCount++
 
-	if currentPlayer.KnightUsedCount >= 3 {
+	if currentPlayer.knightUsedCount >= 3 {
 		for _, otherPlayer := range context.Players {
 			if otherPlayer.ID == context.CurrentPlayerID {
 				continue
 			}
 
-			if currentPlayer.KnightUsedCount > otherPlayer.KnightUsedCount {
+			if currentPlayer.knightUsedCount > otherPlayer.knightUsedCount {
 				currentPlayer.hasLargestArmy = true
 				currentPlayer.calculateScore()
 			}
@@ -62,7 +62,7 @@ func (context *GameContext) stealAPlayer(otherPlayerID int) error {
 
 	// if other player don't have settlement on that tile, throw.
 	hasSettlement := false
-	for _, s := range otherPlayer.Settlements {
+	for _, s := range otherPlayer.settlements {
 		if Contains(s.Indices, context.RobberPlacement) {
 			hasSettlement = true
 		}
@@ -72,7 +72,7 @@ func (context *GameContext) stealAPlayer(otherPlayerID int) error {
 	}
 
 	var availableCardTypes []int
-	for idx, card := range otherPlayer.Cards {
+	for idx, card := range otherPlayer.cards {
 		if card == 0 {
 			continue
 		}
@@ -83,8 +83,8 @@ func (context *GameContext) stealAPlayer(otherPlayerID int) error {
 	if l > 0 {
 		r := rand.Intn(l)
 		randCardType := availableCardTypes[r]
-		otherPlayer.Cards[randCardType]--
-		currentPlayer.Cards[randCardType]++
+		otherPlayer.cards[randCardType]--
+		currentPlayer.cards[randCardType]++
 	}
 
 	context.scheduleAction(ActionTurn)
@@ -98,7 +98,7 @@ func (context *GameContext) randomPlaceRobber() {
 		if player.ID == context.CurrentPlayerID {
 			continue
 		}
-		for _, settlement := range player.Settlements {
+		for _, settlement := range player.settlements {
 			occupiedIns = append(occupiedIns, settlement.Intersection)
 		}
 	}
@@ -113,7 +113,7 @@ func (context *GameContext) randomSelectPlayerToSteal() {
 		if player.ID == context.CurrentPlayerID {
 			continue
 		}
-		for _, settlement := range player.Settlements {
+		for _, settlement := range player.settlements {
 			for _, tileIndex := range settlement.Indices {
 				if tileIndex == context.RobberPlacement {
 					playerToRob = player.ID

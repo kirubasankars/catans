@@ -10,14 +10,14 @@ func (context *GameContext) getPossibleRoads() ([][2]int, error) {
 	if Phase4 == context.phase {
 		currentPlayer := context.getCurrentPlayer()
 
-		noOfCoords := len(currentPlayer.Settlements) + len(currentPlayer.Roads)
+		noOfCoords := len(currentPlayer.settlements) + len(currentPlayer.roads)
 		var occupiedIns = make([]int, noOfCoords)
 		i := 0
-		for _, settlement := range currentPlayer.Settlements {
+		for _, settlement := range currentPlayer.settlements {
 			occupiedIns[i] = settlement.Intersection
 			i++
 		}
-		for _, road := range currentPlayer.Roads {
+		for _, road := range currentPlayer.roads {
 			if !Contains(occupiedIns, road[0]) {
 				occupiedIns[i] = road[0]
 			}
@@ -39,7 +39,7 @@ func (context *GameContext) getPossibleRoads() ([][2]int, error) {
 
 		var allRoads [][2]int
 		for _, player := range context.Players {
-			allRoads = append(allRoads, player.Roads...)
+			allRoads = append(allRoads, player.roads...)
 		}
 
 		var availableRoads [][2]int
@@ -75,8 +75,8 @@ func (context *GameContext) getPossibleRoads() ([][2]int, error) {
 			currentPlayer := context.getCurrentPlayer()
 
 			var firstSettlement *Settlement
-			if len(currentPlayer.Settlements) > 0 {
-				firstSettlement = &currentPlayer.Settlements[0]
+			if len(currentPlayer.settlements) > 0 {
+				firstSettlement = &currentPlayer.settlements[0]
 			}
 			return getRoadsForIntersection(firstSettlement), nil
 		}
@@ -93,9 +93,9 @@ func (context *GameContext) getPossibleRoads() ([][2]int, error) {
 				secondSettlement  *Settlement
 			)
 
-			if len(currentPlayer.Settlements) > 1 {
+			if len(currentPlayer.settlements) > 1 {
 				settlementCounter++
-				secondSettlement = &currentPlayer.Settlements[1]
+				secondSettlement = &currentPlayer.settlements[1]
 			}
 
 			return getRoadsForIntersection(secondSettlement), nil
@@ -142,14 +142,22 @@ func (context *GameContext) putRoad(validate bool, road [2]int) error {
 		banker := context.Bank
 		banker.Begin()
 		for _, card := range cards {
-			currentPlayer.Cards[card[0]] -= card[1]
 			if err := banker.Set(card[0], card[1]); err != nil {
 				banker.Rollback()
 				return err
 			}
 		}
+
+		if err := currentPlayer.addRoad(road); err != nil {
+			banker.Rollback()
+			return err
+		}
 		banker.Commit()
-		currentPlayer.Roads = append(currentPlayer.Roads, road)
+
+		for _, card := range cards {
+			currentPlayer.cards[card[0]] -= card[1]
+		}
+
 		currentPlayer.updateLongestRoad(*context)
 
 		context.EventPutRoad(road)
@@ -162,7 +170,9 @@ func (context *GameContext) putRoad(validate bool, road [2]int) error {
 			return errors.New(ErrInvalidOperation)
 		}
 		currentPlayer := context.getCurrentPlayer()
-		currentPlayer.Roads = append(currentPlayer.Roads, road)
+		if err := currentPlayer.addRoad(road); err != nil {
+			return err
+		}
 		currentPlayer.updateLongestRoad(*context)
 		context.EventPutRoad(road)
 		return context.endAction()

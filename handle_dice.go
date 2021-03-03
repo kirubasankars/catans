@@ -22,7 +22,7 @@ func (context *GameContext) handleDice(dice int) error {
 
 	var cards [][3]int
 	for _, player := range players {
-		for _, settlement := range player.Settlements {
+		for _, settlement := range player.settlements {
 			for idx, token := range settlement.Tokens {
 				if token == dice {
 					tileIndex := settlement.Indices[idx]
@@ -50,7 +50,7 @@ func (context *GameContext) handleDice(dice int) error {
 	for _, card := range cards {
 		player := context.Players[card[0]]
 		cardType := card[1]
-		player.Cards[cardType] = player.Cards[cardType] + card[2]
+		player.cards[cardType] = player.cards[cardType] + card[2]
 		context.EventCardDistributed(player.ID, cardType, card[2])
 	}
 

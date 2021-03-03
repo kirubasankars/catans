@@ -10,7 +10,7 @@ func (context *GameContext) getPossibleSettlementLocations() ([]int, error) {
 
 		var occupiedIns []int
 		for _, player := range context.Players {
-			for _, settlement := range player.Settlements {
+			for _, settlement := range player.settlements {
 				occupiedIns = append(occupiedIns, settlement.Intersection)
 			}
 		}
@@ -26,7 +26,7 @@ func (context *GameContext) getPossibleSettlementLocations() ([]int, error) {
 
 		currentPlayer := context.getCurrentPlayer()
 		var roadsIntersections []int
-		for _, road := range currentPlayer.Roads {
+		for _, road := range currentPlayer.roads {
 			if !Contains(occupiedIns, road[0]) {
 				roadsIntersections = append(roadsIntersections, road[0])
 			}
@@ -50,7 +50,7 @@ func (context *GameContext) getPossibleSettlementLocations() ([]int, error) {
 		}
 		occupied := make([]int, 0)
 		for _, player := range context.Players {
-			for _, s := range player.Settlements {
+			for _, s := range player.settlements {
 				occupied = append(occupied, s.Intersection)
 			}
 		}
@@ -73,6 +73,17 @@ func (context *GameContext) putSettlement(validate bool, intersection int) error
 		if context.getActionString() != ActionPlaceSettlement {
 			return errors.New(ErrInvalidOperation)
 		}
+
+		var settlement Settlement
+		tileIndices := context.board.GetTileIndices(intersection)
+		tokens := make([]int, len(tileIndices))
+		for i, idx := range tileIndices {
+			tokens[i] = context.Tiles[idx][1]
+		}
+		settlement = Settlement{Indices: tileIndices, Tokens: tokens, Intersection: intersection}
+		if err := currentPlayer.addSettlement(settlement); err != nil {
+			return err
+		}
 	}
 
 	if Phase4 == context.phase {
@@ -84,27 +95,31 @@ func (context *GameContext) putSettlement(validate bool, intersection int) error
 		banker := context.Bank
 		banker.Begin()
 		for _, card := range cards {
-			currentPlayer.Cards[card[0]] -= card[1]
+			currentPlayer.cards[card[0]] -= card[1]
 			if err := banker.Set(card[0], card[1]); err != nil {
 				banker.Rollback()
 				return err
 			}
 		}
+
+		var settlement Settlement
+		tileIndices := context.board.GetTileIndices(intersection)
+		tokens := make([]int, len(tileIndices))
+		for i, idx := range tileIndices {
+			tokens[i] = context.Tiles[idx][1]
+		}
+		settlement = Settlement{Indices: tileIndices, Tokens: tokens, Intersection: intersection}
+		if err := currentPlayer.addSettlement(settlement); err != nil {
+			return err
+		}
+		for _, card := range cards {
+			currentPlayer.cards[card[0]] -= card[1]
+		}
 		banker.Commit()
 	}
 
-	var settlement Settlement
-	tileIndices := context.board.GetTileIndices(intersection)
-	tokens := make([]int, len(tileIndices))
-	for i, idx := range tileIndices {
-		tokens[i] = context.Tiles[idx][1]
-	}
-	settlement = Settlement{Indices: tileIndices, Tokens: tokens, Intersection: intersection}
-	currentPlayer.Settlements = append(currentPlayer.Settlements, settlement)
 	context.EventPutSettlement(intersection)
-
 	currentPlayer.calculateScore()
-
 	if Phase2 == context.phase || Phase3 == context.phase {
 		return context.endAction()
 	}
@@ -116,7 +131,7 @@ func (context *GameContext) upgradeSettlement(intersection int) error {
 	currentPlayer := context.getCurrentPlayer()
 	if Phase4 == context.phase {
 		var settlement *Settlement
-		for _, s := range currentPlayer.Settlements {
+		for _, s := range currentPlayer.settlements {
 			if s.Intersection == intersection {
 				settlement = &s
 				break
@@ -134,17 +149,23 @@ func (context *GameContext) upgradeSettlement(intersection int) error {
 		bank := context.Bank
 		bank.Begin()
 		for _, card := range cards {
-			currentPlayer.Cards[card[0]] -= card[1]
+			currentPlayer.cards[card[0]] -= card[1]
 			err := bank.Set(card[0], card[1])
 			if err != nil {
 				bank.Rollback()
 				return err
 			}
 		}
-		bank.Commit()
 
-		settlement.Upgraded = true
+		if err := currentPlayer.upgradeSettlement(settlement); err != nil {
+			return err
+		}
 		currentPlayer.calculateScore()
+
+		for _, card := range cards {
+			currentPlayer.cards[card[0]] -= card[1]
+		}
+		bank.Commit()
 
 		return nil
 	}

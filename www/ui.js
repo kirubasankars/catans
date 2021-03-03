@@ -8,12 +8,12 @@ window.onload = function () {
 
     function a(game) {
         console.log(game)
-        $.get('/board?g='+ game, function (output) {
+        $.get('/board.json', function (output) {
 
-            output = JSON.parse(output)
+            //output = JSON.parse(output)
 
             console.log(output)
-            var printerFriendly = true
+            var printerFriendly = false
 
             var canvas = document.getElementById('board')
             paper.setup(canvas);
@@ -90,34 +90,19 @@ window.onload = function () {
                         _hexagons[el.id] = el
                     })
 
-                    output.intersections.forEach(el => {
-                        if (el.hexagons.length == 2) {
-                            el.hexagons.forEach(h => {
-                                var hx = _hexagons[h]
-                                var point = new paper.Point(hx.x, hx.y)
-                                var cricle = new paper.Path.Circle(point, hx.r + 6);
-                                cricle.fillColor = '#20abfeff';
-                            })
-                            el.hexagons.forEach(h => {
-                                var hx = _hexagons[h]
-                                var point = new paper.Point(hx.x, hx.y)
-                                var cricle = new paper.Path.Circle(point, hx.r + 3);
-                                cricle.fillColor = '#53cbffff';
-                            })
-                            el.hexagons.forEach(h => {
-                                var hx = _hexagons[h]
-                                var point = new paper.Point(hx.x, hx.y)
-                                var cricle = new paper.Path.Circle(point, hx.r);
-                                cricle.fillColor = '#cce9feff';
-                            })
-                        }
-                    })
+                    var p = null
 
                     output.intersections.forEach(el => {
                         if (el.hexagons.length == 3) {
                             var point = new paper.Point(el.x, el.y)
-                            var cricle = new paper.Path.Circle(point, el.r);
+                            var cricle = new paper.Path.Circle(point, el.r + 20);
                             cricle.fillColor = '#d7cf91';
+                            cricle.visible = false
+                            if (p == null) {
+                                p = cricle
+                            } else {
+                                p = p.unite(cricle)
+                            }
                         }
                     })
 
@@ -126,9 +111,39 @@ window.onload = function () {
                             return
                         }
                         var point = new paper.Point(el.x, el.y)
-                        var cricle = new paper.Path.Circle(point, el.r - 3);
+                        var cricle = new paper.Path.Circle(point, el.r);
                         cricle.fillColor = '#d7cf91';
+                        //cricle.visible = false
+
+                        if (p == null) {
+                            p = cricle
+                        } else {
+                            p = p.unite(cricle)
+                        }
                     })
+
+                    let amount = 80;
+                    let length = p.length;
+
+                    let p1 = new paper.Path()
+                    point = p.getPointAt(0 / amount * length)
+                    p1.add(point);
+                    for (let i = 1; i < amount + 1; i++) {
+                        let offset = i / amount * length
+                        let point = p.getPointAt(offset)
+                        p1.add(new paper.Point(point.x - 0.02, point.y + 0.01))
+                    }
+                    p1.fillColor = "#20abfeff";
+
+                    let p2 = p1.clone()
+                    p2.fillColor = "#d7cf91";
+
+                    let p3 = p1.clone()
+                    p3.fillColor = "#cce9feff";
+
+                    p1.scale(1.02)
+                    p2.scale(1-0.02)
+                    p3.scale(1)
                 }
             }
 
@@ -263,7 +278,7 @@ window.onload = function () {
                     cricle.fillColor = getColor(el.port.resource);
                     cricle.strokeColor = getColor(el.port.resource);
                     cricle.fillColor.lightness += 0.09;
-                    cricle.strokeColor.lightness -= 0.09;
+                    cricle.strokeColor.lightness -= 0.5;
 
                     if (printerFriendly) {
                         cricle.fillColor = '#fff'
@@ -325,8 +340,8 @@ window.onload = function () {
             //     }
             // }
 
-            paper.view.scale(1.6)
-            paper.view.center = new paper.Point(400, 300)
+            paper.view.scale(1-0.4)
+            paper.view.center = new paper.Point(200, 440)
 
             canvas.onwheel = function (event) {
                 var newZoom = paper.view.zoom;
@@ -360,6 +375,20 @@ window.onload = function () {
 
                 event.preventDefault();
                 paper.view.draw();
+            }
+
+            var tool = new paper.Tool();
+
+            // Define a mousedown and mousedrag handler
+            tool.onMouseDown = function(event) {
+            }
+
+            tool.onMouseDrag = function(event) {
+                var pan_offset = event.point.subtract(event.downPoint);
+                paper.view.center = paper.view.center.subtract(pan_offset);
+            }
+
+            tool.onMouseUp = function(event) {
             }
         })
     }

@@ -38,7 +38,7 @@ func StartWebServer() {
 
 	http.HandleFunc("/create_game", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
-			gs := GameSetting{NumberOfPlayers: 4, Map: 0, TurnTimeOut: false}
+			gs := GameSetting{NumberOfPlayers: 4, Map: 1, TurnTimeOut: false}
 			gameID, _ := lobby.CreateGame(gs)
 			w.Write([]byte(fmt.Sprintf(`{"g":"%d"}`, gameID)))
 		}

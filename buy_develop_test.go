@@ -13,15 +13,15 @@ func TestBuyDevelopmentCard(t *testing.T) {
 	game.UpdateGameSetting(gs)
 	game.Start()
 	game.context.phase = Phase4
-	game.context.Players[0].Cards = [5]int{}
+	game.context.Players[0].cards = [5]int{}
 
 	game.context.Bank.Get(CardWool, 1)
 	game.context.Bank.Get(CardGrain, 1)
 	game.context.Bank.Get(CardOre, 1)
 
-	game.context.Players[0].Cards[CardWool] = 1
-	game.context.Players[0].Cards[CardGrain] = 1
-	game.context.Players[0].Cards[CardOre] = 1
+	game.context.Players[0].cards[CardWool] = 1
+	game.context.Players[0].cards[CardGrain] = 1
+	game.context.Players[0].cards[CardOre] = 1
 
 	counterFn := func(cards [5]int) int {
 		count := 0
@@ -37,7 +37,7 @@ func TestBuyDevelopmentCard(t *testing.T) {
 		t.FailNow()
 	}
 
-	if len(game.getPlayer(game.CurrentPlayer()).DevCards) <= 0 {
+	if len(game.getPlayer(game.CurrentPlayer()).devCards) <= 0 {
 		t.Log("expected to have dev card, failed")
 		t.Fail()
 	}
@@ -47,7 +47,7 @@ func TestBuyDevelopmentCard(t *testing.T) {
 		t.Fail()
 	}
 
-	if counterFn(game.context.Players[0].Cards) != 0 {
+	if counterFn(game.context.Players[0].cards) != 0 {
 		t.Log("expected to have card removed, failed")
 		t.Fail()
 	}
@@ -61,7 +61,7 @@ func TestBuyDevelopmentCardError(t *testing.T) {
 	game.UpdateGameSetting(gs)
 	game.Start()
 	game.context.phase = Phase4
-	game.context.Players[0].Cards = [5]int{}
+	game.context.Players[0].cards = [5]int{}
 
 	game.context.Bank.Get(CardWool, 1)
 	game.context.Bank.Get(CardGrain, 1)

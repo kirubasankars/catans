@@ -121,13 +121,13 @@ func (context *GameContext) completeTrade(tradeID int) error {
 	player2 := context.Players[trade.To]
 
 	for _, card := range trade.Gives {
-		player1.Cards[card[0]] -= card[1]
-		player2.Cards[card[0]] += card[1]
+		player1.cards[card[0]] -= card[1]
+		player2.cards[card[0]] += card[1]
 	}
 
 	for _, card := range trade.Wants {
-		player1.Cards[card[0]] += card[1]
-		player2.Cards[card[0]] -= card[1]
+		player1.cards[card[0]] += card[1]
+		player2.cards[card[0]] -= card[1]
 	}
 
 	return nil
@@ -158,8 +158,8 @@ func (context *GameContext) bankTrade(gives [2]int, wants int) error {
 				banker.Rollback()
 				return err
 			}
-			currentPlayer.Cards[giveCardType] -= 2
-			currentPlayer.Cards[wantCardType]++
+			currentPlayer.cards[giveCardType] -= 2
+			currentPlayer.cards[wantCardType]++
 		} else if currentPlayer.ownPort31 && giveTradeCount == 3 {
 			if err := banker.Set(giveCardType, giveTradeCount); err != nil {
 				banker.Rollback()
@@ -169,8 +169,8 @@ func (context *GameContext) bankTrade(gives [2]int, wants int) error {
 				banker.Rollback()
 				return err
 			}
-			currentPlayer.Cards[giveCardType] -= 3
-			currentPlayer.Cards[wantCardType]++
+			currentPlayer.cards[giveCardType] -= 3
+			currentPlayer.cards[wantCardType]++
 		}
 	} else {
 		if giveTradeCount == 4 {
@@ -182,8 +182,8 @@ func (context *GameContext) bankTrade(gives [2]int, wants int) error {
 				banker.Rollback()
 				return err
 			}
-			currentPlayer.Cards[giveCardType] -= 4
-			currentPlayer.Cards[wantCardType]++
+			currentPlayer.cards[giveCardType] -= 4
+			currentPlayer.cards[wantCardType]++
 		}
 	}
 	return nil

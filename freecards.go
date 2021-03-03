@@ -6,12 +6,12 @@ func (context *GameContext) giveInitialFreeCards() error {
 	context.Bank.Begin()
 	for _, player := range context.Players {
 		r := rand.Intn(2)
-		indices := player.Settlements[r].Indices
+		indices := player.settlements[r].Indices
 
 		giveCard := func(idx int) {
 			cardType := context.Tiles[indices[idx]][0]
 			context.Bank.Get(cardType, 1)
-			player.Cards[cardType]++
+			player.cards[cardType]++
 			context.EventCardDistributed(player.ID, cardType, 1)
 		}
 

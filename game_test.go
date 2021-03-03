@@ -79,39 +79,39 @@ func TestGameRollDiceAndCards(t *testing.T) {
 	game.PutRoad([2]int{13, 20})
 
 	player0 := game.getPlayer(0)
-	if len(player0.Settlements) != 2 {
+	if len(player0.settlements) != 2 {
 		t.Log("expecting 2 settlements, failed")
 		t.Fail()
 	}
-	if len(player0.Roads) != 2 {
+	if len(player0.roads) != 2 {
 		t.Log("expecting 2 settlements, failed")
 		t.Fail()
 	}
 
 	player1 := game.getPlayer(1)
-	if len(player1.Settlements) != 2 {
+	if len(player1.settlements) != 2 {
 		t.Log("expecting 2 settlements, failed")
 		t.Fail()
 	}
-	if len(player1.Roads) != 2 {
+	if len(player1.roads) != 2 {
 		t.Log("expecting 2 settlements, failed")
 		t.Fail()
 	}
 
-	if player0.Settlements[0].Intersection != 14 {
+	if player0.settlements[0].Intersection != 14 {
 		t.Log("expecting settlement in 14, failed")
 		t.Fail()
 	}
-	if player0.Settlements[1].Intersection != 13 {
+	if player0.settlements[1].Intersection != 13 {
 		t.Log("expecting settlement in 13, failed")
 		t.Fail()
 	}
 
-	if player1.Settlements[0].Intersection != 26 {
+	if player1.settlements[0].Intersection != 26 {
 		t.Log("expecting settlement in 14, failed")
 		t.Fail()
 	}
-	if player1.Settlements[1].Intersection != 41 {
+	if player1.settlements[1].Intersection != 41 {
 		t.Log("expecting settlement in 13, failed")
 		t.Fail()
 	}
@@ -121,24 +121,24 @@ func TestGameRollDiceAndCards(t *testing.T) {
 	game.context.handleDice(8)
 	game.context.handleDice(4)
 
-	//if game.getPlayer(0).Cards[3] != 1 {
+	//if game.getPlayer(0).cards[3] != 1 {
 	//	t.Log("expecting 1 grain, failed")
 	//	t.Fail()
 	//}
-	//if game.getPlayer(0).Cards[1] != 1 {
+	//if game.getPlayer(0).cards[1] != 1 {
 	//	t.Log("expecting 1 brick, failed")
 	//	t.Fail()
 	//}
-	//if game.getPlayer(0).Cards[2] != 1 {
+	//if game.getPlayer(0).cards[2] != 1 {
 	//	t.Log("expecting 1 wool, failed")
 	//	t.Fail()
 	//}
 	//
-	//if game.getPlayer(1).Cards[0] != 1 {
+	//if game.getPlayer(1).cards[0] != 1 {
 	//	t.Log("expecting 1 tree, failed")
 	//	t.Fail()
 	//}
-	//if game.getPlayer(1).Cards[3] != 2 {
+	//if game.getPlayer(1).cards[3] != 2 {
 	//	t.Log("expecting 1 grain, failed")
 	//	t.Fail()
 	//}

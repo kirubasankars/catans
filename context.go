@@ -44,7 +44,7 @@ func (context *GameContext) updateGameSetting(gs GameSetting) error {
 func (context *GameContext) isInitialSettlementDone() bool {
 	settlementCount := 0
 	for _, player := range context.Players {
-		settlementCount = settlementCount + len(player.Settlements)
+		settlementCount = settlementCount + len(player.settlements)
 	}
 	return settlementCount == (context.GameSetting.NumberOfPlayers * 2)
 }
@@ -85,8 +85,8 @@ func (context *GameContext) startPhase4() error {
 
 func (context *GameContext) phase2GetNextAction() string {
 	currentPlayer := context.getCurrentPlayer()
-	settlementCount := len(currentPlayer.Settlements)
-	roadCount := len(currentPlayer.Roads)
+	settlementCount := len(currentPlayer.settlements)
+	roadCount := len(currentPlayer.roads)
 
 	if settlementCount == 0 && roadCount == 0 {
 		return ActionPlaceSettlement
@@ -102,8 +102,8 @@ func (context *GameContext) phase2GetNextAction() string {
 
 func (context *GameContext) phase3GetNextAction() string {
 	currentPlayer := context.getCurrentPlayer()
-	settlementCount := len(currentPlayer.Settlements)
-	roadCount := len(currentPlayer.Roads)
+	settlementCount := len(currentPlayer.settlements)
+	roadCount := len(currentPlayer.roads)
 
 	if settlementCount == 1 && roadCount == 1 {
 		return ActionPlaceSettlement
@@ -225,7 +225,7 @@ func (context GameContext) isPlayerHasAllCards(playerID int, cards [][2]int) boo
 	for _, giveCard := range cards {
 		giveCardType := giveCard[0]
 		giveTradeCount := giveCard[1]
-		if giveTradeCount <= 0 || player.Cards[giveCardType] < giveTradeCount {
+		if giveTradeCount <= 0 || player.cards[giveCardType] < giveTradeCount {
 			return false
 		}
 	}

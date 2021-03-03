@@ -19,7 +19,7 @@ const ActionDevPlaceRoad1 = "PLACE_ROAD1"
 const ActionDevPlaceRoad2 = "PLACE_ROAD2"
 const ActionTurn = "TURN"
 
-//Development Cards
+//Development cards
 const DevCardKnight = 0
 const DevCardVPPoint = 1
 const DevCardMonopoly = 2
