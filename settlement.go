@@ -61,39 +61,42 @@ func (context *GameContext) getPossibleSettlementLocations() ([]int, error) {
 }
 
 func (context *GameContext) putSettlement(validate bool, intersection int) error {
+	currentPlayer := context.getCurrentPlayer()
+	if context.getActionString() != ActionPlaceSettlement || currentPlayer.allowedSettlementCount < 1 {
+		return errors.New(ErrInvalidOperation)
+	}
+
 	if validate {
 		availableIntersections, _ := context.getPossibleSettlementLocations()
 		if !Contains(availableIntersections, intersection) {
 			return errors.New(ErrInvalidOperation)
 		}
 	}
-	currentPlayer := context.getCurrentPlayer()
 
 	if Phase2 == context.phase || Phase3 == context.phase {
-		if context.getActionString() != ActionPlaceSettlement {
-			return errors.New(ErrInvalidOperation)
-		}
-
 		var settlement Settlement
+
 		tileIndices := context.board.GetTileIndices(intersection)
+
 		tokens := make([]int, len(tileIndices))
 		for i, idx := range tileIndices {
 			tokens[i] = context.Tiles[idx][1]
 		}
+
 		settlement = Settlement{Indices: tileIndices, Tokens: tokens, Intersection: intersection}
-		if err := currentPlayer.addSettlement(settlement); err != nil {
-			return err
-		}
+		currentPlayer.settlements = append(currentPlayer.settlements, settlement)
+		currentPlayer.allowedSettlementCount--
 	}
 
 	if Phase4 == context.phase {
-		cards := [][2]int{{0, 1}, {1, 1}, {2, 1}, {3, 1}}
+		cards := [][2]int{{CardLumber, 1}, {CardBrick, 1}, {CardWool, 1}, {CardGrain, 1}}
 		if !context.isPlayerHasAllCards(currentPlayer.ID, cards) {
 			return errors.New(ErrInvalidOperation)
 		}
 
 		banker := context.Bank
 		banker.Begin()
+
 		for _, card := range cards {
 			currentPlayer.cards[card[0]] -= card[1]
 			if err := banker.Set(card[0], card[1]); err != nil {
@@ -101,6 +104,9 @@ func (context *GameContext) putSettlement(validate bool, intersection int) error
 				return err
 			}
 		}
+		for _, card := range cards {
+			currentPlayer.cards[card[0]] -= card[1]
+		}
 
 		var settlement Settlement
 		tileIndices := context.board.GetTileIndices(intersection)
@@ -108,18 +114,17 @@ func (context *GameContext) putSettlement(validate bool, intersection int) error
 		for i, idx := range tileIndices {
 			tokens[i] = context.Tiles[idx][1]
 		}
+
 		settlement = Settlement{Indices: tileIndices, Tokens: tokens, Intersection: intersection}
-		if err := currentPlayer.addSettlement(settlement); err != nil {
-			return err
-		}
-		for _, card := range cards {
-			currentPlayer.cards[card[0]] -= card[1]
-		}
+		currentPlayer.settlements = append(currentPlayer.settlements, settlement)
+		currentPlayer.allowedSettlementCount--
+
 		banker.Commit()
 	}
 
 	context.EventPutSettlement(intersection)
 	currentPlayer.calculateScore()
+
 	if Phase2 == context.phase || Phase3 == context.phase {
 		return context.endAction()
 	}
@@ -130,6 +135,11 @@ func (context *GameContext) putSettlement(validate bool, intersection int) error
 func (context *GameContext) upgradeSettlement(intersection int) error {
 	currentPlayer := context.getCurrentPlayer()
 	if Phase4 == context.phase {
+
+		if currentPlayer.allowedSettlementUpgradeCount < 1 {
+			return errors.New(ErrInvalidOperation)
+		}
+
 		var settlement *Settlement
 		for _, s := range currentPlayer.settlements {
 			if s.Intersection == intersection {
@@ -157,9 +167,8 @@ func (context *GameContext) upgradeSettlement(intersection int) error {
 			}
 		}
 
-		if err := currentPlayer.upgradeSettlement(settlement); err != nil {
-			return err
-		}
+		settlement.Upgraded = true
+		currentPlayer.allowedSettlementUpgradeCount--
 		currentPlayer.calculateScore()
 
 		for _, card := range cards {

@@ -1,7 +1,5 @@
 package main
 
-import "errors"
-
 type Player struct {
 	ID int
 	// 0 - lumber
@@ -23,15 +21,15 @@ type Player struct {
 	hasLongestRoad   bool
 	knightUsedCount  int
 	longestRoadCount int
+	ownPort31 bool
+	ownPort21 bool
+	ports21   [5]int
 
 	allowedSettlementCount        int
 	allowedSettlementUpgradeCount int
 	allowedRoadsCount			  int
 
 	score     int
-	ownPort31 bool
-	ownPort21 bool
-	ports21   [5]int
 }
 
 func (player Player) calculateScore() {
@@ -78,40 +76,6 @@ func (player *Player) updateLongestRoad(context GameContext) {
 			}
 		}
 	}
-}
-
-func (player *Player) addRoad(road [2]int) error {
-	if player.allowedRoadsCount < 1 {
-		return errors.New(ErrInvalidOperation)
-	}
-	player.roads = append(player.roads, road)
-	player.allowedRoadsCount--
-	return nil
-}
-
-func (player *Player) addSettlement(s Settlement) error {
-	if player.allowedSettlementCount < 1 {
-		return errors.New(ErrInvalidOperation)
-	}
-	player.settlements = append(player.settlements, s)
-	player.allowedSettlementCount--
-	return nil
-}
-
-func (player *Player) upgradeSettlement(s *Settlement) error {
-	if player.allowedSettlementUpgradeCount < 1 {
-		return errors.New(ErrInvalidOperation)
-	}
-	s.Upgraded = true
-	player.allowedSettlementUpgradeCount --
-	player.allowedSettlementCount ++
-	return nil
-}
-
-func (player *Player) RemoveLastRoad() error {
-	player.roads = player.roads[:len(player.roads)-1]
-	player.allowedRoadsCount --
-	return nil
 }
 
 func NewPlayer() *Player {

@@ -121,6 +121,11 @@ func (context *GameContext) validateRoadPlacement(road [2]int) error {
 }
 
 func (context *GameContext) putRoad(validate bool, road [2]int) error {
+	currentPlayer := context.getCurrentPlayer()
+	if context.getActionString() != ActionPlaceRoad || currentPlayer.allowedRoadsCount < 1  {
+		return errors.New(ErrInvalidOperation)
+	}
+
 	if road[0] > road[1] {
 		s := road[1]
 		road[1] = road[0]
@@ -133,8 +138,7 @@ func (context *GameContext) putRoad(validate bool, road [2]int) error {
 	}
 
 	if Phase4 == context.phase {
-		currentPlayer := context.getCurrentPlayer()
-		cards := [][2]int{{0, 1}, {1, 1}}
+		cards := [][2]int{{CardLumber, 1}, {CardBrick, 1}}
 		if !context.isPlayerHasAllCards(currentPlayer.ID, cards) {
 			return errors.New(ErrInvalidOperation)
 		}
@@ -148,31 +152,24 @@ func (context *GameContext) putRoad(validate bool, road [2]int) error {
 			}
 		}
 
-		if err := currentPlayer.addRoad(road); err != nil {
-			banker.Rollback()
-			return err
-		}
-		banker.Commit()
-
 		for _, card := range cards {
 			currentPlayer.cards[card[0]] -= card[1]
 		}
 
-		currentPlayer.updateLongestRoad(*context)
+		currentPlayer.roads = append(currentPlayer.roads, road)
+		currentPlayer.allowedRoadsCount--
 
+		banker.Commit()
+
+		currentPlayer.updateLongestRoad(*context)
 		context.EventPutRoad(road)
 
 		return nil
 	}
 
 	if Phase2 == context.phase || Phase3 == context.phase {
-		if context.getActionString() != ActionPlaceRoad {
-			return errors.New(ErrInvalidOperation)
-		}
-		currentPlayer := context.getCurrentPlayer()
-		if err := currentPlayer.addRoad(road); err != nil {
-			return err
-		}
+		currentPlayer.roads = append(currentPlayer.roads, road)
+		currentPlayer.allowedRoadsCount--
 		currentPlayer.updateLongestRoad(*context)
 		context.EventPutRoad(road)
 		return context.endAction()
