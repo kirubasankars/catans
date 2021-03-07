@@ -3,7 +3,7 @@ package main
 import "errors"
 
 func (context *GameContext) playMonopoly(cardType int) error {
-	if context.phase != Phase4 {
+	if context.Phase != Phase4 {
 		return errors.New(ErrInvalidOperation)
 	}
 	currentPlayer := context.getCurrentPlayer()

@@ -1,20 +1,22 @@
 package main
 
 type GameState struct {
-	phase           string
+	Phase           string
 	Action          GameAction
-	EventID         int
-	Events          []string
 	Bank            *Bank
-	CurrentPlayerID int
-	Players         []*Player
 	Tiles           [][2]int
 	RobberPlacement int
+
+	CurrentPlayerID int
+	Players         []*Player
+
+	EventID         int
+	Events          []string
 }
 
 type Settlement struct {
 	Tokens       []int
-	Indices      []int
+	TileIndex    []int
 	Intersection int
 	Upgraded     bool
 }

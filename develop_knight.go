@@ -6,7 +6,7 @@ import (
 )
 
 func (context *GameContext) playKnight() error {
-	if context.phase != Phase4 {
+	if context.Phase != Phase4 {
 		return errors.New(ErrInvalidOperation)
 	}
 	currentPlayer := context.getCurrentPlayer()
@@ -63,7 +63,7 @@ func (context *GameContext) stealAPlayer(otherPlayerID int) error {
 	// if other player don't have settlement on that tile, throw.
 	hasSettlement := false
 	for _, s := range otherPlayer.settlements {
-		if Contains(s.Indices, context.RobberPlacement) {
+		if Contains(s.TileIndex, context.RobberPlacement) {
 			hasSettlement = true
 		}
 	}
@@ -114,7 +114,7 @@ func (context *GameContext) randomSelectPlayerToSteal() {
 			continue
 		}
 		for _, settlement := range player.settlements {
-			for _, tileIndex := range settlement.Indices {
+			for _, tileIndex := range settlement.TileIndex {
 				if tileIndex == context.RobberPlacement {
 					playerToRob = player.ID
 				}

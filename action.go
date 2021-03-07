@@ -36,11 +36,11 @@ func (context *GameContext) getActionTimeout(action string) time.Duration {
 		case ActionRollDice:
 			timeout = 10
 		case ActionPlaceSettlement:
-			if context.phase == Phase2 || context.phase == Phase3 {
+			if context.Phase == Phase2 || context.Phase == Phase3 {
 				timeout = 12
 			}
 		case ActionPlaceRoad:
-			if context.phase == Phase2 || context.phase == Phase3 {
+			if context.Phase == Phase2 || context.Phase == Phase3 {
 				timeout = 15
 			}
 		case ActionDevPlaceRoad1:

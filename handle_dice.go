@@ -25,17 +25,17 @@ func (context *GameContext) handleDice(dice int) error {
 		for _, settlement := range player.settlements {
 			for idx, token := range settlement.Tokens {
 				if token == dice {
-					tileIndex := settlement.Indices[idx]
+					tileIndex := settlement.TileIndex[idx]
 					if tileIndex == context.RobberPlacement {
 						continue
 					}
-					terrain := context.Tiles[settlement.Indices[idx]][0]
+					terrain := context.Tiles[settlement.TileIndex[idx]][0]
 					var count = 0
 					var err error = nil
 					if settlement.Upgraded {
-						count, err = context.Bank.Get(terrain, 2)
+						count, err = context.Bank.Remove(terrain, 2)
 					} else {
-						count, err = context.Bank.Get(terrain, 1)
+						count, err = context.Bank.Remove(terrain, 1)
 					}
 					if err != nil {
 						bank.Rollback()

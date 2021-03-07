@@ -36,7 +36,7 @@ func (bank *Bank) Rollback() {
 	bank.t = nil
 }
 
-func (bank *Bank) Get(cardType int, count int) (int, error) {
+func (bank *Bank) Remove(cardType int, count int) (int, error) {
 	r := bank.cards[cardType] - count
 	if r <= 0 {
 		return -1, errors.New("not enough cards")
@@ -47,7 +47,7 @@ func (bank *Bank) Get(cardType int, count int) (int, error) {
 	return count, nil
 }
 
-func (bank *Bank) Set(cardType int, count int) error {
+func (bank *Bank) Add(cardType int, count int) error {
 	if bank.cards[cardType]+count > 19 {
 		return errors.New(ErrInvalidOperation)
 	}

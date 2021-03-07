@@ -6,7 +6,7 @@ import (
 )
 
 func (context *GameContext) playRoads() error {
-	if context.phase != Phase4 {
+	if context.Phase != Phase4 {
 		return errors.New(ErrInvalidOperation)
 	}
 

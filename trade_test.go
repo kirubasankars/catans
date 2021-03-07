@@ -9,7 +9,7 @@ func TestGameTrade1(t *testing.T) {
 	gs.NumberOfPlayers = 2
 	game.UpdateGameSetting(gs)
 	game.Start()
-	game.context.phase = Phase4
+	game.context.Phase = Phase4
 	game.context.Players[0].cards = [5]int{2, 4, 5, 5, 6}
 	game.context.Players[1].cards = [5]int{4, 2, 6, 7, 8}
 
@@ -46,7 +46,7 @@ func TestGameTradeAcceptAndReject(t *testing.T) {
 	gs.NumberOfPlayers = 3
 	game.UpdateGameSetting(gs)
 	game.Start()
-	game.context.phase = Phase4
+	game.context.Phase = Phase4
 	game.context.Players[0].cards = [5]int{2, 4, 5, 5, 6}
 	game.context.Players[1].cards = [5]int{4, 2, 6, 7, 8}
 
@@ -78,11 +78,11 @@ func TestGameBankTrade(t *testing.T) {
 	gs.NumberOfPlayers = 2
 	game.UpdateGameSetting(gs)
 	game.Start()
-	game.context.phase = Phase4
+	game.context.Phase = Phase4
 	game.context.Players[0].cards = [5]int{0, 4, 5, 0, 0}
 
-	game.context.Bank.Get(CardBrick, 4)
-	game.context.Bank.Get(CardWool, 5)
+	game.context.Bank.Remove(CardBrick, 4)
+	game.context.Bank.Remove(CardWool, 5)
 
 	game.BankTrade([2]int{CardBrick,4}, CardWool)
 	if game.context.Players[0].cards[CardWool] != 6 {

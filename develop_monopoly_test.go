@@ -5,7 +5,7 @@ import "testing"
 func TestPlayMonopoly(t *testing.T) {
 	game := NewGame()
 	game.UpdateGameSetting(GameSetting{NumberOfPlayers: 4, Map: 0})
-	game.context.phase = Phase4
+	game.context.Phase = Phase4
 
 	game.context.Players[0].devCards = append(game.context.Players[0].devCards, DevCardMonopoly)
 	game.context.Players[1].devCards = append(game.context.Players[1].devCards, DevCardMonopoly)

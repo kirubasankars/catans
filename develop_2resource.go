@@ -3,7 +3,7 @@ package main
 import "errors"
 
 func (context *GameContext) play2Resource(cards [2]int) error {
-	if context.phase != Phase4 {
+	if context.Phase != Phase4 {
 		return errors.New(ErrInvalidOperation)
 	}
 	currentPlayer := context.getCurrentPlayer()
@@ -26,7 +26,7 @@ func (context *GameContext) play2Resource(cards [2]int) error {
 	banker.Begin()
 
 	for _, cardType := range cards {
-		if _, err := banker.Get(cardType, 1); err != nil {
+		if _, err := banker.Remove(cardType, 1); err != nil {
 			banker.Rollback()
 			return err
 		}

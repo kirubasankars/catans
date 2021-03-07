@@ -22,7 +22,7 @@ func (context GameContext) getCurrentPlayer() *Player {
 }
 
 func (context *GameContext) updateGameSetting(gs GameSetting) error {
-	if context.GameState.phase != Phase1 || gs.NumberOfPlayers <= 1 || gs.Map < 0 || gs.Map > 1 {
+	if context.GameState.Phase != Phase1 || gs.NumberOfPlayers <= 1 || gs.Map < 0 || gs.Map > 1 {
 		return errors.New(ErrInvalidOperation)
 	}
 	if context.GameSetting.DiscardCardLimit < 7 {
@@ -50,33 +50,33 @@ func (context *GameContext) isInitialSettlementDone() bool {
 }
 
 func (context GameContext) getGamePhase() string {
-	return context.phase
+	return context.Phase
 }
 
 func (context *GameContext) startPhase2() error {
-	if context.phase != Phase1 {
+	if context.Phase != Phase1 {
 		return errors.New(ErrInvalidOperation)
 	}
-	context.phase = Phase2
+	context.Phase = Phase2
 	context.CurrentPlayerID = 0
 	context.scheduleAction(ActionPlaceSettlement)
 	return nil
 }
 
 func (context *GameContext) startPhase3() error {
-	if context.phase != Phase2 {
+	if context.Phase != Phase2 {
 		return errors.New(ErrInvalidOperation)
 	}
-	context.phase = Phase3
+	context.Phase = Phase3
 	context.scheduleAction(ActionPlaceSettlement)
 	return nil
 }
 
 func (context *GameContext) startPhase4() error {
-	if context.phase != Phase3 {
+	if context.Phase != Phase3 {
 		return errors.New(ErrInvalidOperation)
 	}
-	context.phase = Phase4
+	context.Phase = Phase4
 	context.giveInitialFreeCards()
 	context.CurrentPlayerID = 0
 	context.scheduleAction(ActionRollDice)
@@ -117,7 +117,7 @@ func (context *GameContext) phase3GetNextAction() string {
 func (context *GameContext) endAction() error {
 	//fmt.Println("END", context.getActionString(), context.CurrentPlayerID)
 
-	if Phase4 == context.phase {
+	if Phase4 == context.Phase {
 		//clean up trades
 		if len(context.trades) > 0 {
 			context.trades = []*GameTrade{}
@@ -154,7 +154,7 @@ func (context *GameContext) endAction() error {
 		return nil
 	}
 
-	if Phase2 == context.phase {
+	if Phase2 == context.Phase {
 		NumberOfPlayers := context.GameSetting.NumberOfPlayers - 1
 		nextAction := context.phase2GetNextAction()
 		if nextAction == "" && context.CurrentPlayerID < NumberOfPlayers {
@@ -169,7 +169,7 @@ func (context *GameContext) endAction() error {
 		return nil
 	}
 
-	if Phase3 == context.phase {
+	if Phase3 == context.Phase {
 		nextAction := context.phase3GetNextAction()
 		if nextAction == "" && context.CurrentPlayerID > 0 {
 			context.CurrentPlayerID--
@@ -187,7 +187,7 @@ func (context *GameContext) endAction() error {
 }
 
 func (context GameContext) isSafeTrade(gives [][2]int, wants [][2]int) bool {
-	if context.phase != Phase4 {
+	if context.Phase != Phase4 {
 		return false
 	}
 
@@ -245,7 +245,7 @@ func (context GameContext) publishMessage() {
 
 func NewGameContext() *GameContext {
 	gc := new(GameContext)
-	gc.phase = Phase1
+	gc.Phase = Phase1
 	gc.Bank = NewBank()
 	gc.Users = []*User{}
 	return gc

@@ -12,12 +12,12 @@ func TestBuyDevelopmentCard(t *testing.T) {
 	gs.NumberOfPlayers = 2
 	game.UpdateGameSetting(gs)
 	game.Start()
-	game.context.phase = Phase4
+	game.context.Phase = Phase4
 	game.context.Players[0].cards = [5]int{}
 
-	game.context.Bank.Get(CardWool, 1)
-	game.context.Bank.Get(CardGrain, 1)
-	game.context.Bank.Get(CardOre, 1)
+	game.context.Bank.Remove(CardWool, 1)
+	game.context.Bank.Remove(CardGrain, 1)
+	game.context.Bank.Remove(CardOre, 1)
 
 	game.context.Players[0].cards[CardWool] = 1
 	game.context.Players[0].cards[CardGrain] = 1
@@ -60,12 +60,12 @@ func TestBuyDevelopmentCardError(t *testing.T) {
 	gs.NumberOfPlayers = 2
 	game.UpdateGameSetting(gs)
 	game.Start()
-	game.context.phase = Phase4
+	game.context.Phase = Phase4
 	game.context.Players[0].cards = [5]int{}
 
-	game.context.Bank.Get(CardWool, 1)
-	game.context.Bank.Get(CardGrain, 1)
-	game.context.Bank.Get(CardOre, 1)
+	game.context.Bank.Remove(CardWool, 1)
+	game.context.Bank.Remove(CardGrain, 1)
+	game.context.Bank.Remove(CardOre, 1)
 
 	err := game.BuyDevelopmentCard()
 	if err == nil {

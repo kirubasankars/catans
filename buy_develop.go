@@ -4,7 +4,7 @@ import "errors"
 
 func (context *GameContext) buyDevelopmentCard() error {
 	currentPlayer := context.getCurrentPlayer()
-	if Phase4 != context.phase {
+	if Phase4 != context.Phase {
 		return errors.New(ErrInvalidOperation)
 	}
 
@@ -24,7 +24,7 @@ func (context *GameContext) buyDevelopmentCard() error {
 
 	for _, card := range cards {
 		currentPlayer.cards[card[0]] -= card[1]
-		err := bank.Set(card[0], card[1])
+		err := bank.Add(card[0], card[1])
 		if err != nil {
 			bank.Rollback()
 			return err

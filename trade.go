@@ -57,7 +57,7 @@ func (context *GameContext) setupTrade(gives [][2]int, wants [][2]int) ([][2]int
 }
 
 func (context *GameContext) overrideTrade(playerID, tradeID int, gives [][2]int, wants [][2]int) error {
-	if context.phase != Phase4 {
+	if context.Phase != Phase4 {
 		return errors.New(ErrInvalidOperation)
 	}
 
@@ -83,7 +83,7 @@ func (context *GameContext) overrideTrade(playerID, tradeID int, gives [][2]int,
 }
 
 func (context *GameContext) acceptTrade(playerID, tradeID int) error {
-	if context.phase != Phase4 {
+	if context.Phase != Phase4 {
 		return errors.New(ErrInvalidOperation)
 	}
 	trade := context.getTrade(tradeID)
@@ -95,7 +95,7 @@ func (context *GameContext) acceptTrade(playerID, tradeID int) error {
 }
 
 func (context *GameContext) rejectTrade(playerID, tradeID int) error {
-	if context.phase != Phase4 {
+	if context.Phase != Phase4 {
 		return errors.New(ErrInvalidOperation)
 	}
 	trade := context.getTrade(tradeID)
@@ -107,7 +107,7 @@ func (context *GameContext) rejectTrade(playerID, tradeID int) error {
 }
 
 func (context *GameContext) completeTrade(tradeID int) error {
-	if context.phase != Phase4 {
+	if context.Phase != Phase4 {
 		return errors.New(ErrInvalidOperation)
 	}
 	trade := context.getTrade(tradeID)
@@ -150,22 +150,22 @@ func (context *GameContext) bankTrade(gives [2]int, wants int) error {
 
 	if currentPlayer.ownPort21 || currentPlayer.ownPort31 {
 		if currentPlayer.ownPort21 && currentPlayer.ports21[giveCardType] == 1 && giveTradeCount == 2 {
-			if err := banker.Set(giveCardType, giveTradeCount); err != nil {
+			if err := banker.Add(giveCardType, giveTradeCount); err != nil {
 				banker.Rollback()
 				return err
 			}
-			if _, err := banker.Get(wantCardType, wantTradeCount); err != nil {
+			if _, err := banker.Remove(wantCardType, wantTradeCount); err != nil {
 				banker.Rollback()
 				return err
 			}
 			currentPlayer.cards[giveCardType] -= 2
 			currentPlayer.cards[wantCardType]++
 		} else if currentPlayer.ownPort31 && giveTradeCount == 3 {
-			if err := banker.Set(giveCardType, giveTradeCount); err != nil {
+			if err := banker.Add(giveCardType, giveTradeCount); err != nil {
 				banker.Rollback()
 				return err
 			}
-			if _, err := banker.Get(wantCardType, wantTradeCount); err != nil {
+			if _, err := banker.Remove(wantCardType, wantTradeCount); err != nil {
 				banker.Rollback()
 				return err
 			}
@@ -174,11 +174,11 @@ func (context *GameContext) bankTrade(gives [2]int, wants int) error {
 		}
 	} else {
 		if giveTradeCount == 4 {
-			if err := banker.Set(giveCardType, giveTradeCount); err != nil {
+			if err := banker.Add(giveCardType, giveTradeCount); err != nil {
 				banker.Rollback()
 				return err
 			}
-			if _, err := banker.Get(wantCardType, wantTradeCount); err != nil {
+			if _, err := banker.Remove(wantCardType, wantTradeCount); err != nil {
 				banker.Rollback()
 				return err
 			}

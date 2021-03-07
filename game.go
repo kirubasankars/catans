@@ -164,10 +164,10 @@ func (game *Game) run() {
 		return
 	}
 
-	//fmt.Println(context.phase, context.Action.Name, context.getCurrentPlayer().ID)
+	//fmt.Println(context.Phase, context.Action.Name, context.getCurrentPlayer().ID)
 
 	playerAction := context.getAction()
-	if context.phase == Phase2 || context.phase == Phase3 {
+	if context.Phase == Phase2 || context.Phase == Phase3 {
 		switch playerAction.Name {
 		case ActionPlaceSettlement:
 			{

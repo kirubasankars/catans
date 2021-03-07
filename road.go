@@ -7,7 +7,7 @@ import (
 
 func (context *GameContext) getPossibleRoads() ([][2]int, error) {
 
-	if Phase4 == context.phase {
+	if Phase4 == context.Phase {
 		currentPlayer := context.getCurrentPlayer()
 
 		noOfCoords := len(currentPlayer.settlements) + len(currentPlayer.roads)
@@ -58,7 +58,7 @@ func (context *GameContext) getPossibleRoads() ([][2]int, error) {
 		return availableRoads, nil
 	}
 
-	if Phase2 == context.phase || Phase3 == context.phase {
+	if Phase2 == context.Phase || Phase3 == context.Phase {
 		getRoadsForIntersection := func(settlement *Settlement) [][2]int {
 			var roads [][2]int
 			if settlement != nil {
@@ -68,7 +68,7 @@ func (context *GameContext) getPossibleRoads() ([][2]int, error) {
 			return roads
 		}
 
-		if Phase2 == context.phase {
+		if Phase2 == context.Phase {
 			if context.getActionString() != ActionPlaceRoad {
 				return nil, errors.New(ErrInvalidOperation)
 			}
@@ -81,7 +81,7 @@ func (context *GameContext) getPossibleRoads() ([][2]int, error) {
 			return getRoadsForIntersection(firstSettlement), nil
 		}
 
-		if Phase3 == context.phase {
+		if Phase3 == context.Phase {
 			nextAction := context.getAction()
 			if nextAction != nil && nextAction.Name != ActionPlaceRoad {
 				return nil, errors.New(ErrInvalidOperation)
@@ -137,7 +137,7 @@ func (context *GameContext) putRoad(validate bool, road [2]int) error {
 		}
 	}
 
-	if Phase4 == context.phase {
+	if Phase4 == context.Phase {
 		cards := [][2]int{{CardLumber, 1}, {CardBrick, 1}}
 		if !context.isPlayerHasAllCards(currentPlayer.ID, cards) {
 			return errors.New(ErrInvalidOperation)
@@ -145,8 +145,10 @@ func (context *GameContext) putRoad(validate bool, road [2]int) error {
 
 		banker := context.Bank
 		banker.Begin()
+
+
 		for _, card := range cards {
-			if err := banker.Set(card[0], card[1]); err != nil {
+			if err := banker.Add(card[0], card[1]); err != nil {
 				banker.Rollback()
 				return err
 			}
@@ -158,7 +160,6 @@ func (context *GameContext) putRoad(validate bool, road [2]int) error {
 
 		currentPlayer.roads = append(currentPlayer.roads, road)
 		currentPlayer.allowedRoadsCount--
-
 		banker.Commit()
 
 		currentPlayer.updateLongestRoad(*context)
@@ -167,7 +168,7 @@ func (context *GameContext) putRoad(validate bool, road [2]int) error {
 		return nil
 	}
 
-	if Phase2 == context.phase || Phase3 == context.phase {
+	if Phase2 == context.Phase || Phase3 == context.Phase {
 		currentPlayer.roads = append(currentPlayer.roads, road)
 		currentPlayer.allowedRoadsCount--
 		currentPlayer.updateLongestRoad(*context)
